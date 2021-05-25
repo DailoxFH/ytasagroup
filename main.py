@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, make_response, Response, send_from_directory
 import string
 import random
+import hashlib
 
 rooms = {}
 app = Flask(__name__, static_url_path="/static", template_folder="templates", static_folder="static")
@@ -64,7 +65,8 @@ def create_cookie(roomId, username):
     resp = make_response(redirect(url_for("watchyt", roomid=roomId), code=307))
     id = generate_random(24, True)
     resp.set_cookie(username, id)
-    rooms[roomId]["user"][username] = id
+    h = hashlib.sha512(id.encode())
+    rooms[roomId]["user"][username] = h.hexdigest()
     return resp
 
 
@@ -180,8 +182,21 @@ def submit_text():
     except(KeyError, TypeError):
         return invalid_request()
 
+
+
+
+
     try:
-        if rooms[roomid]["user"][cookie_keys[0]] == cookie_values[0]:
+        cookie_keys = list(request.cookies.keys())
+        cookie_values = list(request.cookies.values())
+        check_cookie_ret = check_cookie(request.cookies, cookie_values)
+        where = check_cookie_ret[0]
+        avoid = check_cookie_ret[1]
+        if len(list(cookie_keys)) > 1:
+            return delete_cookies(roomid, request.cookies, avoid)
+
+        hashed_value = hashlib.sha512(cookie_values[where].encode())
+        if rooms[roomid]["user"][cookie_keys[where]] == hashed_value.hexdigest():
             eventToUpdate = convert(event)
 
             if rooms[roomid]["video"]["event"] == eventToUpdate:
