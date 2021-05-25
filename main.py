@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, make_response, Response
+from flask import Flask, render_template, request, redirect, url_for, make_response, Response, send_from_directory
 import string
 import random
 
 rooms = {}
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="/static", template_folder="templates", static_folder="static")
 
 def generate_random(iter, lower=False):
     if lower:
@@ -245,6 +245,12 @@ def changed():
         return {"status": "OUT", "video": currentYtId, "event": currentEvent, "time": currentTime, "doneBy": currentDoneBy}
 
     return {"status": "OK", "doneBy": currentDoneBy, "event": currentEvent, "time": currentTime}
+
+
+@app.route("/js/<path:path>")
+def send_js(path):
+    return send_from_directory("js", path)
+
 
 if __name__ == '__main__':
     from waitress import serve
