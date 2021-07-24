@@ -38,16 +38,23 @@ def check_if_room_exists(roomid):
         return False
 
 
-def check_cookie(cookies, cookie_values):
-    where = 0
-    avoid = []
+def check_cookie(cookies, cookie_values, roomId):
+    where = ""
+    avoid = [[]]
     for i in range(0, len(cookies)):
         value = cookie_values[i]
-        if value is None or value == '"' or value == "" or value == " ":
-            avoid.append(i)
-            continue
+        key = list(cookies.keys())[i]
+        for k1,v1 in rooms.items():
+            for k2, v2 in rooms[k1].items():
+                if k2 == "user":
+                    for k3, v3 in rooms[k1][k2].items():
+                        if k3 == key and v3 == value:
+                            avoid.append(i)
+                            break
         else:
-            where = i
+            for k, v in cookies.items():
+                if k in rooms[roomId]["user"].keys():
+                    where = k
     if len(avoid) == 0:
         avoid.append(where)
     return [where, avoid]
@@ -67,20 +74,6 @@ def create_cookie(roomId, username):
     resp.set_cookie(username, id)
     h = hashlib.sha512(id.encode())
     rooms[roomId]["user"][username] = h.hexdigest()
-    return resp
-
-
-def delete_cookies(roomId, cookies, avoid):
-    resp = make_response(redirect(url_for("watchyt", roomid=roomId), code=307))
-    for i in range(0, len(cookies)):
-        if i not in avoid:
-            resp.delete_cookie(list(cookies)[i])
-            try:
-                rooms.pop(list(cookies)[i])
-            except KeyError:
-                continue
-        else:
-            continue
     return resp
 
 
@@ -105,26 +98,20 @@ def watchyt():
 
     yt_id = get_id_from_link(ytid)
 
-    haveToDelete = False
-    avoid = []
-    cookie_keys = []
-    where = 0
+    where = ""
     try:
-        cookie_keys = list(request.cookies.keys())
         cookie_values = list(request.cookies.values())
-        check_cookie_ret = check_cookie(request.cookies, cookie_values)
+        check_cookie_ret = check_cookie(request.cookies, cookie_values, roomId)
         where = check_cookie_ret[0]
-        avoid = check_cookie_ret[1]
-        if len(list(cookie_keys)) > 1:
-            return delete_cookies(roomId, request.cookies, avoid)
         # noinspection PyStatementEffect
-        rooms[roomId]["user"][cookie_keys[where]] != cookie_values[where]
+        rooms[roomId]["user"][where] != request.cookies[where]
     except (KeyError, IndexError):
         try:
             username = request.form["username"]
             if username == "" or username.isspace():
                 raise KeyError
             try:
+                # print("bla")
                 # noinspection PyStatementEffect
                 rooms[roomId]["user"][username]
                 return username_already_taken()
@@ -138,8 +125,7 @@ def watchyt():
                   '</form>'
             return ret
 
-    # return str(cookie_keys)
-    return render_template("watchyt.html", ytid=yt_id, roomId=roomId, user=cookie_keys[where])
+    return render_template("watchyt.html", ytid=yt_id, roomId=roomId, user=where)
 
 
 @app.route("/generate_room", methods=["POST"])
@@ -182,21 +168,12 @@ def submit_text():
     except(KeyError, TypeError):
         return invalid_request()
 
-
-
-
-
     try:
-        cookie_keys = list(request.cookies.keys())
         cookie_values = list(request.cookies.values())
-        check_cookie_ret = check_cookie(request.cookies, cookie_values)
+        check_cookie_ret = check_cookie(request.cookies, cookie_values, roomid)
         where = check_cookie_ret[0]
-        avoid = check_cookie_ret[1]
-        if len(list(cookie_keys)) > 1:
-            return delete_cookies(roomid, request.cookies, avoid)
-
-        hashed_value = hashlib.sha512(cookie_values[where].encode())
-        if rooms[roomid]["user"][cookie_keys[where]] == hashed_value.hexdigest():
+        hashed_value = hashlib.sha512(request.cookies[where].encode())
+        if rooms[roomid]["user"][where] == hashed_value.hexdigest():
             eventToUpdate = convert(event)
 
             if rooms[roomid]["video"]["event"] == eventToUpdate:
@@ -208,9 +185,9 @@ def submit_text():
 
             if request.args.get("automaticallydone") == "true":
                 if time == rooms[roomid]["video"]["time"]:
-                    rooms[roomid]["video"]["doneBy"] = cookie_keys[0]
+                    rooms[roomid]["video"]["doneBy"] = where
             else:
-                rooms[roomid]["video"]["doneBy"] = cookie_keys[0]
+                rooms[roomid]["video"]["doneBy"] = where
 
             return "Rooms successfully updated"
         else:
