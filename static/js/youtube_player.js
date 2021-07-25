@@ -127,7 +127,6 @@ function checkChanged() {
 document.getElementById("submit").addEventListener('click', function (e) {
     yt_id = document.getElementById("ytid").value;
     submit(2);
-    console.log(yt_id);
     player.loadVideoById(yt_id);
     document.getElementById("input_ytid").value = yt_id;
 });

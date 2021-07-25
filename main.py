@@ -243,7 +243,7 @@ def changed():
     currentTime = rooms[roomid]["video"]["time"]
     currentDoneBy = rooms[roomid]["video"]["doneBy"]
 
-    if currentEvent != eventToCheck or currentYtId != ytid and request.args.get("automaticallydone") == "true":
+    if currentEvent != eventToCheck or currentYtId != ytid:
         return {"status": "OUT", "video": currentYtId, "event": currentEvent, "time": currentTime, "doneBy": currentDoneBy}
 
     return {"status": "OK", "doneBy": currentDoneBy, "event": currentEvent, "time": currentTime}
