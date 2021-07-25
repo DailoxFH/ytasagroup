@@ -40,24 +40,13 @@ def check_if_room_exists(roomid):
 
 def check_cookie(cookies, cookie_values, roomId):
     where = ""
-    avoid = [[]]
     for i in range(0, len(cookies)):
         value = cookie_values[i]
         key = list(cookies.keys())[i]
-        for k1,v1 in rooms.items():
-            for k2, v2 in rooms[k1].items():
-                if k2 == "user":
-                    for k3, v3 in rooms[k1][k2].items():
-                        if k3 == key and v3 == value:
-                            avoid.append(i)
-                            break
-        else:
-            for k, v in cookies.items():
-                if k in rooms[roomId]["user"].keys():
-                    where = k
-    if len(avoid) == 0:
-        avoid.append(where)
-    return [where, avoid]
+        for k, v in cookies.items():
+            if k in rooms[roomId]["user"].keys():
+                where = k
+    return where
 
 
 def get_id_from_link(input):
@@ -106,8 +95,7 @@ def watchyt():
     where = ""
     try:
         cookie_values = list(request.cookies.values())
-        check_cookie_ret = check_cookie(request.cookies, cookie_values, roomId)
-        where = check_cookie_ret[0]
+        where = check_cookie(request.cookies, cookie_values, roomId)
         # noinspection PyStatementEffect
         rooms[roomId]["user"][where] != request.cookies[where]
     except (KeyError, IndexError):
@@ -180,8 +168,7 @@ def submit_text():
 
     try:
         cookie_values = list(request.cookies.values())
-        check_cookie_ret = check_cookie(request.cookies, cookie_values, roomid)
-        where = check_cookie_ret[0]
+        where = check_cookie(request.cookies, cookie_values, roomid)
         hashed_value = hashlib.sha512(request.cookies[where].encode())
         if rooms[roomid]["user"][where] == hashed_value.hexdigest():
             eventToUpdate = convert(event)
