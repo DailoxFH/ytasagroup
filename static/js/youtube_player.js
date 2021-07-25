@@ -18,12 +18,13 @@ function onYouTubeIframeAPIReady() {
           videoId: yt_id,
           playerVars: {
             'playsinline': 1,
-            'autoplay': 0
+            'autoplay': 0,
           },
           events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange,
           }
+
         });
 }
 
@@ -43,32 +44,45 @@ function onPlayerStateChange(event) {
 
 function submit(event) {
     var xhr = new XMLHttpRequest();
-    var requeststr = window.location.origin+"/submit_text?ytid="+yt_id+"&roomid="+room_id+"&event="+event+"&time="+player.getCurrentTime()+"&automaticallydone="+dontSubmit;
+    time = 0;
+    if(player.getCurrentTime() != undefined) {
+      time = player.getCurrentTime();
+    }
+    var requeststr = window.location.origin+"/submit_text?ytid="+yt_id+"&roomid="+room_id+"&event="+event+"&time="+time+"&automaticallydone="+dontSubmit;
     xhr.open("GET", requeststr, true);
     xhr.onloadend = function () {
-      if(xhr.status == 401) {
+      if(xhr.status == 401 || xhr.status == 400) {
         document.body.innerHTML = xhr.responseText;
         alert(xhr.responseText);
         clearInterval(t);
+      } else if (xhr.responseText.status == "OK"){
+        if(xhr.responseText.ytid !== undefined) {
+            yt_id = xhr.responseText.ytid;
+        }
       }
-    }
+
     if(finished) {
       dontSubmit = false;
       finished = false;
     }
-    xhr.send();
+   }
+   xhr.send();
 }
 
 function checkChanged() {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", window.location.origin+"/changed?roomid="+room_id+"&event="+player.getPlayerState()+"&ytid="+yt_id+"&time="+player.getCurrentTime(), true);
+    time = 0;
+    if(player.getCurrentTime() != undefined) {
+      time = player.getCurrentTime();
+    }
+    xhr.open("GET", window.location.origin+"/changed?roomid="+room_id+"&event="+player.getPlayerState()+"&ytid="+yt_id+"&time="+time, true);
     xhr.onload = function () {
       var obj = JSON.parse(xhr.responseText);
       if(obj.status !== "OK") {
         if(obj.video != yt_id) {
           yt_id = obj.video;
           player.loadVideoById(yt_id, obj.time);
-          document.getElementById("div_ytid").innerHTML = yt_id;
+          document.getElementById("input_ytid").innerHTML = yt_id;
         }
 
         dontSubmit = true;
@@ -106,13 +120,14 @@ function checkChanged() {
         }
       }
     xhr.send();
+
 }
 
 
 document.getElementById("submit").addEventListener('click', function (e) {
-    var ytid = document.getElementById("ytid").value;
-    yt_id = ytid
+    yt_id = document.getElementById("ytid").value;
     submit(2);
-    document.getElementById("div_ytid").innerHTML = yt_id;
+    console.log(yt_id);
     player.loadVideoById(yt_id);
+    document.getElementById("input_ytid").value = yt_id;
 });

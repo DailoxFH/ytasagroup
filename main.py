@@ -61,11 +61,14 @@ def check_cookie(cookies, cookie_values, roomId):
 
 
 def get_id_from_link(input):
-    if '/' in input:
+    toCheck = ["/watch?v=", "/embed/", "/v/"]
+    if "/watch?v=" in input:
         splittedUrl = input.split('/')
         return splittedUrl[-1].replace("watch?v=", "")
-    else:
+    elif len(input) == 11 and '/' not in input:
         return input
+    else:
+        return False
 
 
 def create_cookie(roomId, username):
@@ -96,8 +99,10 @@ def watchyt():
     except KeyError:
         ytid = rooms[roomId]["video"]["ytid"]
 
-    yt_id = get_id_from_link(ytid)
 
+    yt_id = get_id_from_link(ytid)
+    if not ytid:
+        return invalid_request()
     where = ""
     try:
         cookie_values = list(request.cookies.values())
@@ -111,7 +116,6 @@ def watchyt():
             if username == "" or username.isspace():
                 raise KeyError
             try:
-                # print("bla")
                 # noinspection PyStatementEffect
                 rooms[roomId]["user"][username]
                 return username_already_taken()
@@ -157,12 +161,18 @@ def generate_room():
 @app.route("/submit_text", methods=["GET"])
 def submit_text():
     try:
-        ytid = request.args.get("ytid")
+        ytid = get_id_from_link(request.args.get("ytid"))
+        if not ytid:
+            return invalid_request()
         roomid = request.args.get("roomid")
         if not check_if_room_exists(roomid):
             return room_not_found()
         event = request.args.get("event")
-        time = float(request.args.get("time"))
+        try:
+            time = float(request.args.get("time"))
+        except ValueError:
+            return invalid_request()
+
         cookie_keys = list(request.cookies.keys())
         cookie_values = list(request.cookies.values())
     except(KeyError, TypeError):
@@ -188,8 +198,7 @@ def submit_text():
                     rooms[roomid]["video"]["doneBy"] = where
             else:
                 rooms[roomid]["video"]["doneBy"] = where
-
-            return "Rooms successfully updated"
+            return {"status": "OK", "ytid": ytid}
         else:
             return username_not_found()
     except (KeyError, IndexError, TypeError):
@@ -221,7 +230,9 @@ def changed():
         if not check_if_room_exists(roomid):
             return room_not_found()
         event = request.args.get("event")
-        ytid = request.args.get("ytid")
+        ytid = get_id_from_link(request.args.get("ytid"))
+        if not ytid:
+            return invalid_request()
     except KeyError:
         return invalid_request()
 
@@ -232,8 +243,7 @@ def changed():
     currentTime = rooms[roomid]["video"]["time"]
     currentDoneBy = rooms[roomid]["video"]["doneBy"]
 
-
-    if currentEvent != eventToCheck or currentYtId != ytid:
+    if currentEvent != eventToCheck or currentYtId != ytid and request.args.get("automaticallydone") == "true":
         return {"status": "OUT", "video": currentYtId, "event": currentEvent, "time": currentTime, "doneBy": currentDoneBy}
 
     return {"status": "OK", "doneBy": currentDoneBy, "event": currentEvent, "time": currentTime}
