@@ -16,7 +16,7 @@ function onYouTubeIframeAPIReady() {
           videoId: yt_id,
           playerVars: {
             'playsinline': 1,
-            'autoplay': 0,
+            'autoplay': 1,
           },
           events: {
             'onReady': onPlayerReady,
