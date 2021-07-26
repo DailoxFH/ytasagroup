@@ -50,8 +50,8 @@ def check_cookie(cookies, cookie_values, roomId):
 
 
 def get_id_from_link(input):
-    toCheck = ["/watch?v=", "/embed/", "/v/"]
-    if "/watch?v=" in input:
+    toCheck = ["/watch?v=", "/embed/", "/v/", "youtu.be"]
+    if any(substring in input for substring in toCheck):
         splittedUrl = input.split('/')
         return splittedUrl[-1].replace("watch?v=", "")
     elif len(input) == 11 and '/' not in input:
@@ -173,8 +173,8 @@ def submit_text():
         if rooms[roomid]["user"][where] == hashed_value.hexdigest():
             eventToUpdate = convert(event)
 
-            if rooms[roomid]["video"]["event"] == eventToUpdate:
-                return "Rooms stay the same"
+            if rooms[roomid]["video"]["event"] == eventToUpdate and rooms[roomid]["video"]["ytid"] == ytid:
+                return {"status": "Rooms stay the same"}
 
             rooms[roomid]["video"]["ytid"] = ytid
             rooms[roomid]["video"]["event"] = eventToUpdate
@@ -233,7 +233,7 @@ def changed():
     if currentEvent != eventToCheck or currentYtId != ytid:
         return {"status": "OUT", "video": currentYtId, "event": currentEvent, "time": currentTime, "doneBy": currentDoneBy}
 
-    return {"status": "OK", "doneBy": currentDoneBy, "event": currentEvent, "time": currentTime}
+    return {"status": "OK", "doneBy": currentDoneBy, "event": currentEvent, "time": currentTime, "video": currentYtId}
 
 
 @app.route("/js/<path:path>")

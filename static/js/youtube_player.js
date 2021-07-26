@@ -1,9 +1,7 @@
 var yt_id = document.getElementById("input_ytid").value;
 var room_id = document.getElementById("input_roomid").value;
 var finished = false;
-
 var dontSubmit = false;
-
 var tag = document.createElement('script');
 
 tag.src = "https://www.youtube.com/iframe_api";
@@ -42,22 +40,28 @@ function onPlayerStateChange(event) {
   submit(event.data);
 }
 
-function submit(event) {
-    var xhr = new XMLHttpRequest();
+function submit(event, asynchronous=true) {
+    var submit_xhr = new XMLHttpRequest();
     time = 0;
+    var tmpYtId = yt_id;
     if(player.getCurrentTime() != undefined) {
       time = player.getCurrentTime();
     }
     var requeststr = window.location.origin+"/submit_text?ytid="+yt_id+"&roomid="+room_id+"&event="+event+"&time="+time+"&automaticallydone="+dontSubmit;
-    xhr.open("GET", requeststr, true);
-    xhr.onloadend = function () {
-      if(xhr.status == 401 || xhr.status == 400) {
+    
+    
+    submit_xhr.open("GET", requeststr, asynchronous);
+
+
+    submit_xhr.onloadend = function () {
+      var obj = JSON.parse(submit_xhr.responseText);
+      if(submit_xhr.status == 401 || submit_xhr.status == 400) {
         document.body.innerHTML = xhr.responseText;
-        alert(xhr.responseText);
+        alert(submit_xhr.responseText);
         clearInterval(t);
-      } else if (xhr.responseText.status == "OK"){
-        if(xhr.responseText.ytid !== undefined) {
-            yt_id = xhr.responseText.ytid;
+      } else if (obj.status == "OK"){
+        if(obj.ytid !== undefined && obj.ytid !== yt_id) {
+            tmpYtId = obj.ytid;
         }
       }
 
@@ -66,7 +70,10 @@ function submit(event) {
       finished = false;
     }
    }
-   xhr.send();
+   submit_xhr.send();
+
+   yt_id = tmpYtId;
+   
 }
 
 function checkChanged() {
@@ -79,10 +86,10 @@ function checkChanged() {
     xhr.onload = function () {
       var obj = JSON.parse(xhr.responseText);
       if(obj.status !== "OK") {
-        if(obj.video != yt_id) {
+        if(obj.video !== yt_id) {
           yt_id = obj.video;
           player.loadVideoById(yt_id, obj.time);
-          document.getElementById("input_ytid").innerHTML = yt_id;
+          document.getElementById("input_ytid").value = yt_id;
         }
 
         dontSubmit = true;
@@ -108,6 +115,7 @@ function checkChanged() {
         yt_id = obj.video;
 
       }
+
       document.getElementById("change").innerHTML = obj.doneBy + " did: "+obj.event+" ("+obj.time+")";
       currentChange = obj.doneBy;
 }
@@ -123,10 +131,9 @@ function checkChanged() {
 
 }
 
-
 document.getElementById("submit").addEventListener('click', function (e) {
     yt_id = document.getElementById("ytid").value;
-    submit(2);
-    player.loadVideoById(yt_id);
+    submit(2, false);
     document.getElementById("input_ytid").value = yt_id;
+    player.loadVideoById(yt_id);
 });
