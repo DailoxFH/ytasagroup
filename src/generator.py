@@ -45,3 +45,8 @@ def check_if_room_exists(rooms, roomid):
         return True
     except KeyError:
         return False
+
+def remove_risky(s):
+    s = s.replace("<", "")
+    s = s.replace(">", "")
+    return s

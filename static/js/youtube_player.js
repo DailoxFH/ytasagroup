@@ -116,7 +116,7 @@ function checkChanged() {
 
       }
 
-      document.getElementById("change").innerHTML = obj.doneBy + " did: "+obj.event+" ("+obj.time+")";
+      document.getElementById("change").value = obj.doneBy + " did: "+obj.event+" ("+obj.time+")";
       currentChange = obj.doneBy;
 }
 
