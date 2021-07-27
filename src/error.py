@@ -1,5 +1,6 @@
 from flask import Response
 
+
 def room_not_found():
     return Response("Room not found OR could not be created", status=404)
 
@@ -15,3 +16,6 @@ def invalid_request():
 def username_already_taken():
     return Response("Username already taken", status=401)
 
+
+def username_too_long():
+    return Response("Username is too long. Please choose a shorter one")

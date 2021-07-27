@@ -138,7 +138,3 @@ document.getElementById("submit").addEventListener('click', function (e) {
     document.getElementById("input_ytid").value = yt_id;
     player.loadVideoById(yt_id);
 });
-
-document.getElementById("change").addEventListener("input", function (e) {
-  this.style.width = this.value.length + "ch";
-});

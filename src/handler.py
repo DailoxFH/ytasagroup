@@ -16,6 +16,8 @@ def create_cookie(room_id, username):
     cookie_ret = cookies.create_cookie(room_id, username)
     resp = cookie_ret[0]
     removed_username = cookie_ret[1]
+    if len(removed_username) >= 26:
+        return error.username_too_long()
     val = cookie_ret[2]
     rooms[room_id]["user"][removed_username] = val
     return resp
