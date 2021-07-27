@@ -115,8 +115,9 @@ function checkChanged() {
         yt_id = obj.video;
 
       }
-
-      document.getElementById("change").value = obj.doneBy + " did: "+obj.event+" ("+obj.time+")";
+      var changeInput = document.getElementById("change");
+      changeInput.value = obj.doneBy + " did: "+obj.event+" ("+obj.time+")";
+      changeInput.style.width = changeInput.value.length + "ch";
       currentChange = obj.doneBy;
 }
 
@@ -136,4 +137,8 @@ document.getElementById("submit").addEventListener('click', function (e) {
     submit(2, false);
     document.getElementById("input_ytid").value = yt_id;
     player.loadVideoById(yt_id);
+});
+
+document.getElementById("change").addEventListener("input", function (e) {
+  this.style.width = this.value.length + "ch";
 });
