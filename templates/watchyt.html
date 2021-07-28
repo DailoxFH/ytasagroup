@@ -1,26 +1,45 @@
 <!DOCTYPE html>
   <html lang="en">
   <head>
+    <link rel="stylesheet" href="static/css/style.css">
     <title>YouTube Watch</title>
   </head>
     <body>
-    YT ID:
-    <input id="input_ytid" value="{{ ytid }}" disabled>
-    Room ID:
-    <input id="input_roomid" value="{{ roomId }}" disabled>
-    User:
-    <input id="input_user" value="{{ user }}" disabled>
 
-    Change made by:
-    <input id="change" disabled>
+    <div class="row">
+      <div class="col-3">
+        YT ID:
+        <input id="input_ytid" value="{{ ytid }}" disabled>
+      </div>
+      <div class="col-3">
+        Room ID:
+        <input id="input_roomid" value="{{ roomId }}" disabled>
+      </div>
+      <div class="col-3">
+        User:
+      <input id="input_user" value="{{ user }}" disabled>
+      </div>
+      <div class="col-3">
+        Change made by:
+        <input id="change" disabled>
+      </div>
+    </div>
 
-    <div>
-      <div id="player"></div>
+    
+
+    <div class="row">
+      <div id="player" class="ytplayer"></div>
     </div>
     <br>
     <br>
-    <input type="text" id="ytid">
-    <button id="submit">Submit</button>
+    <div class="row">
+      <div class="col-9">
+        <input type="text" id="ytid" placeholder="YouTube ID">
+      </div>
+      <div class="col-3">
+        <button id="submit" class="button">Submit</button>
+      </div>
+    </div>
 
     <script src="/static/js/youtube_player.js"></script>
     </body>

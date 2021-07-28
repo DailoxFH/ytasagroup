@@ -1,15 +1,25 @@
 <!DOCTYPE html>
   <html lang="en">
   <head>
+    <link rel="stylesheet" href="static/css/style.css">
     <title>YouTube Watch</title>
   </head>
   <body>
-    <h3>{{already_taken}}</h3>
-    <h3>Please provide a username:</h3>
-    <br> <br>
-    <form action="/watch_yt?roomid={{room_id}}" method="post">
-    <input type="text" placeholder="Username" name="username" />
-    <input type="submit"/>
-    </form>
+    <!--<h3>{{already_taken}}</h3> -->
+    <div class="row">
+      <div class="col-12">
+        <h3>Please provide a username:</h3>
+      </div>
+    </div>
+    <div class="row">
+      <form action="/watch_yt?roomid={{room_id}}" method="post">
+        <div class="col-9">
+          <input type="text" placeholder="Username" name="username" />
+        </div>
+        <div class="col-3">
+          <input type="submit" class="button"/>
+        </div>
+      </form>
+    </div>
   </body>
 

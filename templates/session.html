@@ -1,13 +1,16 @@
  <!DOCTYPE html>
   <html lang="en">
   <head>
+    <link rel="stylesheet" href="static/css/style.css">
     <title>YouTube as a group</title>
   </head>
   <body>
-    <form action="/generate_room" method="post">
-      <input type="text" placeholder="YouTube ID" name="ytid"/>
-      <input type="text" placeholder="Username" name="username" />
-      <input type="submit"/>
-    </form>
+  <div class="center">
+      <form action="/generate_room" method="post">
+        <input type="text" class="form_input" placeholder="YouTube ID" name="ytid"/>
+        <input type="text" class="form_input" placeholder="Username" name="username"/>
+        <input type="submit" class="button"/>
+      </form>
+  </div>
   </body>
   </html>

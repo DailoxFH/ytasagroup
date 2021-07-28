@@ -11,8 +11,6 @@ firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 var player;
 function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
-          height: '390',
-          width: '640',
           videoId: yt_id,
           playerVars: {
             'playsinline': 1,
@@ -117,7 +115,7 @@ function checkChanged() {
       }
       var changeInput = document.getElementById("change");
       changeInput.value = obj.doneBy + " did: "+obj.event+" ("+obj.time+")";
-      changeInput.style.width = changeInput.value.length + "ch";
+      //changeInput.style.width = changeInput.value.length + "ch";
       currentChange = obj.doneBy;
 }
 
