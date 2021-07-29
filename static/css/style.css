@@ -32,17 +32,6 @@ input {
     height: 750px;
 }
 
-@media only screen and (min-width: 600px) {
-    input {
-        display:flex;
-        }
-}
-@media only screen and (min-width: 768px) {
-    .col-3 {width: 25%;}
-    .col-9 {width: 75%;}
-    .col-12 {width:100%;}
-}
-
 /*https://codepen.io/seme332/pen/reJOwo*/
 .button {
     width: 100%;
@@ -85,4 +74,15 @@ input:focus {
 h3 {
     font-weight: normal;
     text-align: center;
+}
+
+@media only screen and (min-width: 600px) {
+    input {
+        display:flex;
+        }
+}
+@media only screen and (min-width: 768px) {
+    .col-3 {width: 25%;}
+    .col-9 {width: 75%;}
+    .col-12 {width:100%;}
 }
