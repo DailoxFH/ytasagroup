@@ -111,6 +111,7 @@ h3 {
     .col-12 {width:100%;}
     .header .col-1{
         float: right;
+        text-align: right;
     }
 
     .logo {
