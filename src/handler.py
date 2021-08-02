@@ -2,8 +2,10 @@ from flask import Flask, render_template, request, send_from_directory
 from src import error
 from src import cookies
 from src import generator
+from shared_memory_dict import SharedMemoryDict
 
-rooms = {}
+rooms = SharedMemoryDict(name='rooms', size=1049000)
+
 app = Flask(__name__, static_url_path="/static", template_folder="../templates", static_folder="../static")
 
 
@@ -19,7 +21,12 @@ def create_cookie(room_id, username):
     if len(removed_username) >= 26:
         return error.username_too_long()
     val = cookie_ret[2]
-    rooms[room_id]["user"][removed_username] = val
+
+    video = rooms[room_id]["video"]
+    user = rooms[room_id]["user"]
+    user.__setitem__(removed_username, val)
+    full_update = {room_id: {"video": video, "user": user}}
+    rooms.update(full_update)
     return resp
 
 
@@ -79,10 +86,8 @@ def generate_room():
 
     yt_id = generator.get_id_from_link(yt_id)
 
-    full_update = {room_id: {"video": {"ytid": yt_id, "event": "NOTHING", "time": 0.0, "doneBy": "NONE"}}}
+    full_update = {room_id: {"video": {"ytid": yt_id, "event": "NOTHING", "time": 0.0, "doneBy": "NONE"}, "user": {}}}
     rooms.update(full_update)
-
-    rooms[room_id]["user"] = {}
 
     return create_cookie(room_id, username)
 
@@ -115,15 +120,9 @@ def submit_text():
             if rooms[room_id]["video"]["event"] == event_to_update and rooms[room_id]["video"]["ytid"] == yt_id:
                 return {"status": "Rooms stay the same"}
 
-            rooms[room_id]["video"]["ytid"] = yt_id
-            rooms[room_id]["video"]["event"] = event_to_update
-            rooms[room_id]["video"]["time"] = time
-
-            if request.args.get("automaticallydone") == "true":
-                if time == rooms[room_id]["video"]["time"]:
-                    rooms[room_id]["video"]["doneBy"] = where
-            else:
-                rooms[room_id]["video"]["doneBy"] = where
+            user = rooms[room_id]["user"]
+            full_update = {room_id: {"video": {"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": where}, "user": user}}
+            rooms.update(full_update)
             return {"status": "OK", "ytid": yt_id}
         else:
             return error.username_not_found()
