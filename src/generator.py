@@ -46,7 +46,17 @@ def check_if_room_exists(rooms, roomid):
     except KeyError:
         return False
 
+
 def remove_risky(s):
     s = s.replace("<", "")
     s = s.replace(">", "")
     return s
+
+
+def update_dict(base_dict, to_add):
+    try:
+        for k, v in to_add.items():
+            base_dict.__setitem__(k, v)
+    except AttributeError:
+        return base_dict
+    return base_dict

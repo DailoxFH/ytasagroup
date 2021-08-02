@@ -14,6 +14,17 @@ def sessions():
     return render_template('session.html')
 
 
+def update_rooms(room_id, user_to_add, video_to_add):
+    video = rooms[room_id]["video"]
+    user = rooms[room_id]["user"]
+
+    video = generator.update_dict(video, video_to_add)
+    user = generator.update_dict(user, user_to_add)
+
+    full_update = {room_id: {"video": video, "user": user}}
+    rooms.update(full_update)
+
+
 def create_cookie(room_id, username):
     cookie_ret = cookies.create_cookie(room_id, username)
     resp = cookie_ret[0]
@@ -22,12 +33,7 @@ def create_cookie(room_id, username):
         return error.username_too_long()
     val = cookie_ret[2]
 
-    video = rooms[room_id]["video"]
-    user = rooms[room_id]["user"]
-    user.__setitem__(removed_username, val)
-    video.__setitem__("joined", True)
-    full_update = {room_id: {"video": video, "user": user}}
-    rooms.update(full_update)
+    update_rooms(room_id, {removed_username: val}, {"joined": True})
     return resp
 
 
@@ -121,9 +127,7 @@ def submit_text():
             if rooms[room_id]["video"]["event"] == event_to_update and rooms[room_id]["video"]["ytid"] == yt_id:
                 return {"status": "Rooms stay the same"}
 
-            user = rooms[room_id]["user"]
-            full_update = {room_id: {"video": {"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": where, "joined": False}, "user": user}}
-            rooms.update(full_update)
+            update_rooms(room_id, None, {"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": where, "joined": False})
             return {"status": "OK", "ytid": yt_id}
         else:
             return error.username_not_found()

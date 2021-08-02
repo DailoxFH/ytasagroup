@@ -2,8 +2,9 @@ var yt_id = document.getElementById("input_ytid").value;
 var room_id = document.getElementById("input_roomid").value;
 var finished = false;
 var dontSubmit = false;
-var tag = document.createElement('script');
 
+
+var tag = document.createElement('script');
 tag.src = "https://www.youtube.com/iframe_api";
 var firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
@@ -34,8 +35,16 @@ function onPlayerStateChange(event) {
   if(event.data == 3 || event.data == -1) {
     return;
   }
-
   submit(event.data);
+}
+
+function checkForError(xhr) {
+  if(xhr.status == 401 || xhr.status == 400 || xhr.status == 404) {
+    document.body.innerHTML = xhr.responseText;
+    clearInterval(t);
+    return true;
+  }
+  return false;
 }
 
 function submit(event, asynchronous=true) {
@@ -53,21 +62,17 @@ function submit(event, asynchronous=true) {
 
     submit_xhr.onloadend = function () {
       var obj = JSON.parse(submit_xhr.responseText);
-      if(submit_xhr.status == 401 || submit_xhr.status == 400) {
-        document.body.innerHTML = xhr.responseText;
-        alert(submit_xhr.responseText);
-        clearInterval(t);
-      } else if (obj.status == "OK"){
-        if(obj.ytid !== undefined && obj.ytid !== yt_id) {
+      checkForError(submit_xhr);
+      if (obj.status == "OK" && obj.ytid !== undefined && obj.ytid !== yt_id){
             tmpYtId = obj.ytid;
         }
       }
+    
 
     if(finished) {
       dontSubmit = false;
       finished = false;
     }
-   }
    submit_xhr.send();
 
    yt_id = tmpYtId;
@@ -110,30 +115,23 @@ function checkChanged() {
           player.pauseVideo();
 
         }
-
         finished = true;
 
         yt_id = obj.video;
-
       }
       var changeInput = document.getElementById("change");
       changeInput.value = obj.doneBy + " did: "+obj.event+" ("+obj.time+")";
-      //changeInput.style.width = changeInput.value.length + "ch";
       currentChange = obj.doneBy;
 }
 
     xhr.onloadend = function () {
-      if(xhr.status == 404) {
-        document.body.innerHTML = xhr.responseText;
-        alert(xhr.responseText);
-        clearInterval(t);
-        }
+      checkForError(xhr);
       }
     xhr.send();
 
 }
 
-document.getElementById("submit").addEventListener('click', function (e) {
+document.getElementById("submit").addEventListener('click', function () {
     yt_id = document.getElementById("ytid").value;
     submit(2, false);
     document.getElementById("input_ytid").value = yt_id;
