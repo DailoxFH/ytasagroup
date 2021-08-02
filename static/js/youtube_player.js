@@ -46,8 +46,8 @@ function submit(event, asynchronous=true) {
       time = player.getCurrentTime();
     }
     var requeststr = window.location.origin+"/submit_text?ytid="+yt_id+"&roomid="+room_id+"&event="+event+"&time="+time+"&automaticallydone="+dontSubmit;
-    
-    
+
+
     submit_xhr.open("GET", requeststr, asynchronous);
 
 
@@ -71,7 +71,7 @@ function submit(event, asynchronous=true) {
    submit_xhr.send();
 
    yt_id = tmpYtId;
-   
+
 }
 
 function checkChanged() {
@@ -83,6 +83,9 @@ function checkChanged() {
     xhr.open("GET", window.location.origin+"/changed?roomid="+room_id+"&event="+player.getPlayerState()+"&ytid="+yt_id+"&time="+time, true);
     xhr.onload = function () {
       var obj = JSON.parse(xhr.responseText);
+      if(obj.joined) {
+        submit(2);
+      }
       if(obj.status !== "OK") {
         if(obj.video !== yt_id) {
           yt_id = obj.video;

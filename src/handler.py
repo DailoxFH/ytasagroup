@@ -25,6 +25,7 @@ def create_cookie(room_id, username):
     video = rooms[room_id]["video"]
     user = rooms[room_id]["user"]
     user.__setitem__(removed_username, val)
+    video.__setitem__("joined", True)
     full_update = {room_id: {"video": video, "user": user}}
     rooms.update(full_update)
     return resp
@@ -121,7 +122,7 @@ def submit_text():
                 return {"status": "Rooms stay the same"}
 
             user = rooms[room_id]["user"]
-            full_update = {room_id: {"video": {"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": where}, "user": user}}
+            full_update = {room_id: {"video": {"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": where, "joined": False}, "user": user}}
             rooms.update(full_update)
             return {"status": "OK", "ytid": yt_id}
         else:
@@ -153,7 +154,7 @@ def changed():
     if current_event != event_to_check or current_yt_id != yt_id:
         return {"status": "OUT", "video": current_yt_id, "event": current_event, "time": current_time, "doneBy": current_done_by}
 
-    return {"status": "OK", "doneBy": current_done_by, "event": current_event, "time": current_time, "video": current_yt_id}
+    return {"status": "OK", "doneBy": current_done_by, "event": current_event, "time": current_time, "video": current_yt_id, "joined": rooms[room_id]["video"]["joined"]}
 
 
 @app.route("/js/<path:path>")
