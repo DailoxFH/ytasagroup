@@ -88,9 +88,7 @@ function checkChanged() {
     xhr.open("GET", window.location.origin+"/changed?roomid="+room_id+"&event="+player.getPlayerState()+"&ytid="+yt_id+"&time="+time, true);
     xhr.onload = function () {
       var obj = JSON.parse(xhr.responseText);
-      if(obj.joined) {
-        submit(2);
-      }
+      console.log(obj.seenNotification);
       if(obj.status !== "OK") {
         if(obj.video !== yt_id) {
           yt_id = obj.video;
@@ -118,6 +116,11 @@ function checkChanged() {
         finished = true;
 
         yt_id = obj.video;
+      } 
+      if (obj.joined != undefined && !obj.seenNotification && obj.seenNotification != undefined) {
+          submit(2);
+          document.getElementById("username_to_show").innerHTML = '"'+obj.joined+'"';
+          showAlert();
       }
       var changeInput = document.getElementById("change");
       changeInput.value = obj.doneBy + " did: "+obj.event+" ("+obj.time+")";

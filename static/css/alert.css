@@ -1,0 +1,89 @@
+/* 
+https://www.codingnepalweb.com/custom-warning-alert-notification/ 
+*/
+
+.alert {
+  background:#990000;
+  padding: 20px;
+  width: 100%;
+  position: absolute;
+  right: 0;
+  top: 10px;
+  border-radius: 4px;
+  border-left: 8px solid rgb(179, 3, 3);
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+
+  text-align: left;
+}
+
+.alert.showAlert{
+  opacity: 1;
+  pointer-events: auto;
+}
+.alert.show{
+  animation: show_slide 1s ease forwards;
+}
+@keyframes show_slide {
+  0%{
+    transform: translateX(100%);
+  }
+  40%{
+    transform: translateX(-10%);
+  }
+  80%{
+    transform: translateX(0%);
+  }
+  100%{
+    transform: translateX(-10px);
+  }
+}
+.alert.hide{
+  animation: hide_slide 1s ease forwards;
+}
+@keyframes hide_slide {
+  0%{
+    transform: translateX(-10px);
+  }
+  40%{
+    transform: translateX(0%);
+  }
+  80%{
+    transform: translateX(-10%);
+  }
+  100%{
+    transform: translateX(100%);
+  }
+}
+.alert .msg{
+  font-size: 18px;
+  color: black;
+}
+.alert .msg::after {
+  content: "\A";
+  white-space: pre;
+}
+.alert .close-btn{
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgb(179, 3, 3);
+  padding: 30px 20px;
+  cursor: pointer;
+}
+.alert .close-btn:hover{
+  background: rgb(231, 5, 5);
+}
+
+
+@media only screen and (min-width: 768px) {
+  .alert{
+    min-width: 200px;
+    max-width: 338px;
+  }
+  
+}
+
+/**/

@@ -15,25 +15,38 @@ def sessions():
 
 
 def update_rooms(room_id, user_to_add, video_to_add):
-    video = rooms[room_id]["video"]
-    user = rooms[room_id]["user"]
+    base_video = rooms[room_id]["video"]
+    base_user = rooms[room_id]["user"]
 
-    video = generator.update_dict(video, video_to_add)
-    user = generator.update_dict(user, user_to_add)
-
+    video = generator.update_dict(base_video, video_to_add)
+    user = generator.update_dict(base_user, user_to_add)
     full_update = {room_id: {"video": video, "user": user}}
     rooms.update(full_update)
+
+
+def check_user(room_id):
+    where = cookies.check_cookie(rooms, request.cookies, room_id)
+    hashed_value = cookies.hashlib.sha512(request.cookies[where].encode())
+    password = rooms[room_id]["user"][where]["password"]
+    if password == hashed_value.hexdigest():
+        return {"status": True, "where": where, "password": password}
+    else:
+        return False
 
 
 def create_cookie(room_id, username):
     cookie_ret = cookies.create_cookie(room_id, username)
     resp = cookie_ret[0]
     removed_username = cookie_ret[1]
-    if len(removed_username) >= 26:
+    if len(removed_username) >= 21:
         return error.username_too_long()
     val = cookie_ret[2]
 
-    update_rooms(room_id, {removed_username: val}, {"joined": True})
+    update_rooms(room_id, {removed_username: {"password": val}}, {"joined": removed_username})
+
+    for k, v in rooms[room_id]["user"].items():
+        update_rooms(room_id, {k: {"password": rooms[room_id]["user"][k]["password"], "seenNotification": False}}, None)
+
     return resp
 
 
@@ -95,7 +108,6 @@ def generate_room():
 
     full_update = {room_id: {"video": {"ytid": yt_id, "event": "NOTHING", "time": 0.0, "doneBy": "NONE"}, "user": {}}}
     rooms.update(full_update)
-
     return create_cookie(room_id, username)
 
 
@@ -119,15 +131,15 @@ def submit_text():
         return error.invalid_request()
 
     try:
-        where = cookies.check_cookie(rooms, request.cookies, room_id)
-        hashed_value = cookies.hashlib.sha512(request.cookies[where].encode())
-        if rooms[room_id]["user"][where] == hashed_value.hexdigest():
+        check_user_ret = check_user(room_id)
+        if check_user_ret["status"]:
             event_to_update = generator.convert(event)
+            stay_done_by = check_user_ret["where"]
 
             if rooms[room_id]["video"]["event"] == event_to_update and rooms[room_id]["video"]["ytid"] == yt_id:
-                return {"status": "Rooms stay the same"}
+                stay_done_by = rooms[room_id]["video"]["doneBy"]
 
-            update_rooms(room_id, None, {"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": where, "joined": False})
+            update_rooms(room_id, {check_user_ret["where"]: {"password": check_user_ret["password"], "seenNotification": True}}, {"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": stay_done_by})
             return {"status": "OK", "ytid": yt_id}
         else:
             return error.username_not_found()
@@ -148,17 +160,28 @@ def changed():
     except KeyError:
         return error.invalid_request()
 
-    event_to_check = generator.convert(event)
+    try:
+        check_user_ret = check_user(room_id)
+        if check_user_ret["status"]:
+            event_to_check = generator.convert(event)
 
-    current_event = rooms[room_id]["video"]["event"]
-    current_yt_id = rooms[room_id]["video"]["ytid"]
-    current_time = rooms[room_id]["video"]["time"]
-    current_done_by = rooms[room_id]["video"]["doneBy"]
+            current_event = rooms[room_id]["video"]["event"]
+            current_yt_id = rooms[room_id]["video"]["ytid"]
+            current_time = rooms[room_id]["video"]["time"]
+            current_done_by = rooms[room_id]["video"]["doneBy"]
 
-    if current_event != event_to_check or current_yt_id != yt_id:
-        return {"status": "OUT", "video": current_yt_id, "event": current_event, "time": current_time, "doneBy": current_done_by}
+            status = "OK"
+            if current_event != event_to_check or current_yt_id != yt_id:
+                status = "OUT"
 
-    return {"status": "OK", "doneBy": current_done_by, "event": current_event, "time": current_time, "video": current_yt_id, "joined": rooms[room_id]["video"]["joined"]}
+            return {"status": status, "doneBy": current_done_by, "event": current_event, "time": current_time,
+                    "video": current_yt_id, "joined": rooms[room_id]["video"]["joined"],
+                    "seenNotification": rooms[room_id]["user"][check_user_ret["where"]]["seenNotification"]}
+        else:
+            return error.username_not_found()
+
+    except (KeyError, IndexError, TypeError):
+        return error.username_not_found()
 
 
 @app.route("/js/<path:path>")
