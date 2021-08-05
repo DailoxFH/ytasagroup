@@ -38,6 +38,8 @@ def create_cookie(room_id, username):
     cookie_ret = cookies.create_cookie(room_id, username)
     resp = cookie_ret[0]
     removed_username = cookie_ret[1]
+    if not removed_username or removed_username.isspace():
+        return error.invalid_username()
     if len(removed_username) >= 21:
         return error.username_too_long()
     val = cookie_ret[2]
@@ -104,8 +106,7 @@ def generate_room():
     while room_id in rooms:
         room_id = generator.generate_random(15)
 
-    yt_id = generator.get_id_from_link(yt_id)
-
+    yt_id = generator.remove_risky(generator.get_id_from_link(yt_id))
     full_update = {room_id: {"video": {"ytid": yt_id, "event": "NOTHING", "time": 0.0, "doneBy": "NONE"}, "user": {}}}
     rooms.update(full_update)
     return create_cookie(room_id, username)
@@ -133,13 +134,16 @@ def submit_text():
     try:
         check_user_ret = check_user(room_id)
         if check_user_ret["status"]:
-            event_to_update = generator.convert(event)
+            event_to_update = generator.remove_risky(generator.convert(event))
             stay_done_by = check_user_ret["where"]
 
             if rooms[room_id]["video"]["event"] == event_to_update and rooms[room_id]["video"]["ytid"] == yt_id:
                 stay_done_by = rooms[room_id]["video"]["doneBy"]
 
-            update_rooms(room_id, {check_user_ret["where"]: {"password": check_user_ret["password"], "seenNotification": True}}, {"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": stay_done_by})
+            username = generator.remove_risky(check_user_ret["where"])
+            yt_id = generator.remove_risky(yt_id)
+            stay_done_by = generator.remove_risky(stay_done_by)
+            update_rooms(room_id, {username: {"password": check_user_ret["password"], "seenNotification": True}}, {"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": stay_done_by})
             return {"status": "OK", "ytid": yt_id}
         else:
             return error.username_not_found()

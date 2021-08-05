@@ -48,8 +48,13 @@ def check_if_room_exists(rooms, roomid):
 
 
 def remove_risky(s):
-    s = s.replace("<", "")
+    s = s.replace("&", "")
     s = s.replace(">", "")
+    s = s.replace("<", "")
+    s = s.replace("'", "")
+    s = s.replace('"', "")
+
+    s = s.replace(" ", "_")
     return s
 
 

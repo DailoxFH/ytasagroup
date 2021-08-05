@@ -18,4 +18,8 @@ def username_already_taken():
 
 
 def username_too_long():
-    return Response("Username is too long. Please choose a shorter one")
+    return Response("Username is too long. Please choose a shorter one", status=400)
+
+
+def invalid_username():
+    return Response("Invalid username. Please choose a different one", status=400)
