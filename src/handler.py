@@ -15,7 +15,6 @@ def sessions():
 
 
 def update_rooms(room_id, user_to_add=None, video_to_add=None, delete=""):
-
     base_video = rooms[room_id]["video"]
     base_user = rooms[room_id]["user"]
 
@@ -56,7 +55,8 @@ def create_cookie(room_id, username):
     update_rooms(room_id, user_to_add={removed_username: {"password": val}}, video_to_add={"joined": removed_username})
 
     for k, v in rooms[room_id]["user"].items():
-        update_rooms(room_id, user_to_add={k: {"password": rooms[room_id]["user"][k]["password"], "seenNotification": False}})
+        update_rooms(room_id,
+                     user_to_add={k: {"password": rooms[room_id]["user"][k]["password"], "seenNotification": False}})
 
     return resp
 
@@ -122,7 +122,11 @@ def generate_room():
     while room_id in rooms:
         room_id = generator.generate_random(15)
 
-    yt_id = generator.remove_risky(generator.get_id_from_link(yt_id))
+    yt_id = generator.get_id_from_link(yt_id)
+    if not yt_id:
+        return error.invalid_request()
+    else:
+        yt_id = generator.remove_risky(yt_id)
     full_update = {room_id: {"video": {"ytid": yt_id, "event": "NOTHING", "time": 0.0, "doneBy": "NONE"}, "user": {}}}
     rooms.update(full_update)
     return create_cookie(room_id, username)
@@ -159,7 +163,7 @@ def submit_text():
             username = generator.remove_risky(check_user_ret["where"])
             yt_id = generator.remove_risky(yt_id)
             stay_done_by = generator.remove_risky(stay_done_by)
-            update_rooms(room_id, user_to_add={username: {"password": check_user_ret["password"], "seenNotification": True}}, video_to_add={"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": stay_done_by})
+            update_rooms(room_id, user_to_add={username:{"password": check_user_ret["password"], "seenNotification": True}}, video_to_add={"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": stay_done_by})
             return {"status": "OK", "ytid": yt_id}
         else:
             return error.username_not_found()
@@ -233,4 +237,3 @@ def send_css(path):
 
 def get_app():
     return app
-
