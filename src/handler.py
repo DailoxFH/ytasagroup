@@ -14,13 +14,22 @@ def sessions():
     return render_template('session.html')
 
 
-def update_rooms(room_id, user_to_add, video_to_add):
+def update_rooms(room_id, user_to_add=None, video_to_add=None, delete=""):
+
     base_video = rooms[room_id]["video"]
     base_user = rooms[room_id]["user"]
 
-    video = generator.update_dict(base_video, video_to_add)
-    user = generator.update_dict(base_user, user_to_add)
-    full_update = {room_id: {"video": video, "user": user}}
+    if not delete and video_to_add is not None:
+        base_video = generator.update_dict(base_video, video_to_add)
+    if not delete and user_to_add is not None:
+        base_user = generator.update_dict(base_user, user_to_add)
+    else:
+        if video_to_add is not None:
+            del base_video[delete]
+        if user_to_add is not None:
+            del base_user[delete]
+
+    full_update = {room_id: {"video": base_video, "user": base_user}}
     rooms.update(full_update)
 
 
@@ -44,10 +53,10 @@ def create_cookie(room_id, username):
         return error.username_too_long()
     val = cookie_ret[2]
 
-    update_rooms(room_id, {removed_username: {"password": val}}, {"joined": removed_username})
+    update_rooms(room_id, user_to_add={removed_username: {"password": val}}, video_to_add={"joined": removed_username})
 
     for k, v in rooms[room_id]["user"].items():
-        update_rooms(room_id, {k: {"password": rooms[room_id]["user"][k]["password"], "seenNotification": False}}, None)
+        update_rooms(room_id, user_to_add={k: {"password": rooms[room_id]["user"][k]["password"], "seenNotification": False}})
 
     return resp
 
@@ -78,18 +87,21 @@ def watch_yt():
         else:
             raise KeyError
     except (KeyError, IndexError):
+
         try:
             username = request.form["username"]
-            if username == "" or username.isspace():
-                raise KeyError
-            try:
-                # noinspection PyStatementEffect
-                rooms[room_id]["user"][username]
-                return error.username_already_taken()
-            except KeyError:
-                return create_cookie(room_id, username)
         except KeyError:
             return render_template("username.html", room_id=room_id, already_taken="")
+
+        if not username or username.isspace():
+            return error.invalid_request()
+
+        try:
+            # noinspection PyStatementEffect
+            rooms[room_id]["user"][username]
+            return error.username_already_taken()
+        except KeyError:
+            return create_cookie(room_id, username)
 
     return render_template("watchyt.html", ytid=yt_id, roomId=room_id, user=where)
 
@@ -147,7 +159,7 @@ def submit_text():
             username = generator.remove_risky(check_user_ret["where"])
             yt_id = generator.remove_risky(yt_id)
             stay_done_by = generator.remove_risky(stay_done_by)
-            update_rooms(room_id, {username: {"password": check_user_ret["password"], "seenNotification": True}}, {"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": stay_done_by})
+            update_rooms(room_id, user_to_add={username: {"password": check_user_ret["password"], "seenNotification": True}}, video_to_add={"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": stay_done_by})
             return {"status": "OK", "ytid": yt_id}
         else:
             return error.username_not_found()
@@ -192,6 +204,23 @@ def changed():
         return error.username_not_found()
 
 
+@app.route("/disconnect", methods=["GET"])
+def disconnect():
+    try:
+        room_id = request.args.get("roomid")
+        if not generator.check_if_room_exists(rooms, room_id):
+            return error.room_not_found()
+    except KeyError:
+        return error.invalid_request()
+
+    check_user_ret = check_user(room_id)
+    if check_user_ret["status"]:
+        update_rooms(room_id, user_to_add={}, delete=check_user_ret["where"])
+        return "Success"
+    else:
+        return error.username_not_found()
+
+
 @app.route("/js/<path:path>")
 def send_js(path):
     return send_from_directory("js", path)
@@ -204,3 +233,4 @@ def send_css(path):
 
 def get_app():
     return app
+

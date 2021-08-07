@@ -1,3 +1,10 @@
+window.addEventListener("beforeunload", function () {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", window.location.origin+"/disconnect?roomid="+room_id)
+  xhr.send();
+
+});
+
 var yt_id = document.getElementById("input_ytid").value;
 var room_id = document.getElementById("input_roomid").value;
 var finished = false;
@@ -139,3 +146,4 @@ document.getElementById("submit").addEventListener('click', function () {
     document.getElementById("input_ytid").value = yt_id;
     player.loadVideoById(yt_id);
 });
+
