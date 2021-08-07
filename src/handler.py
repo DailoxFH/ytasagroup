@@ -31,7 +31,7 @@ def check_user(room_id):
     if password == hashed_value.hexdigest():
         return {"status": True, "where": where, "password": password}
     else:
-        return False
+        return {"status": False}
 
 
 def create_cookie(room_id, username):
@@ -70,9 +70,13 @@ def watch_yt():
     if not yt_id:
         return error.invalid_request()
     try:
-        where = cookies.check_cookie(rooms, request.cookies, room_id)
-        # noinspection PyStatementEffect
-        rooms[room_id]["user"][where] != request.cookies[where]
+        check_user_ret = check_user(room_id)
+        if check_user_ret["status"]:
+            where = check_user_ret["where"]
+            # noinspection PyStatementEffect
+            rooms[room_id]["user"][where] != request.cookies[where]
+        else:
+            raise KeyError
     except (KeyError, IndexError):
         try:
             username = request.form["username"]

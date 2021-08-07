@@ -88,7 +88,6 @@ function checkChanged() {
     xhr.open("GET", window.location.origin+"/changed?roomid="+room_id+"&event="+player.getPlayerState()+"&ytid="+yt_id+"&time="+time, true);
     xhr.onload = function () {
       var obj = JSON.parse(xhr.responseText);
-      console.log(obj.seenNotification);
       if(obj.status !== "OK") {
         if(obj.video !== yt_id) {
           yt_id = obj.video;
