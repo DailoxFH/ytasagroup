@@ -9,6 +9,7 @@ var yt_id = document.getElementById("input_ytid").value;
 var room_id = document.getElementById("input_roomid").value;
 var finished = false;
 var dontSubmit = false;
+var lastLog = "";
 
 
 var tag = document.createElement('script');
@@ -43,6 +44,18 @@ function onPlayerStateChange(event) {
     return;
   }
   submit(event.data);
+}
+
+function updateLog(toUpdate) {
+  if(toUpdate != lastLog) {
+    var currentDate = new Date();
+    var finalToUpdate = "\n("+currentDate.getHours()+":"+currentDate.getMinutes()+":"+currentDate.getSeconds()+")"+" "+toUpdate;
+    var eventLog = document.getElementById("event-log");
+    var changeInput = document.getElementById("change");
+    changeInput.value = toUpdate;
+    eventLog.value += finalToUpdate;
+    lastLog = toUpdate;
+  }
 }
 
 function checkForError(xhr) {
@@ -122,22 +135,26 @@ function checkChanged() {
         finished = true;
 
         yt_id = obj.video;
+
+
       } 
       if (obj.joined != undefined && !obj.seenNotification && obj.seenNotification != undefined) {
           submit(2);
-          document.getElementById("username_to_show").innerHTML = '"'+obj.joined+'"';
+          var toUpdate = '"'+obj.joined+'"';
+          document.getElementById("username_to_show").innerHTML = toUpdate;
           showAlert();
+          updateLog(toUpdate+" joined!");
       }
-      var changeInput = document.getElementById("change");
-      changeInput.value = obj.doneBy + " did: "+obj.event+" ("+obj.time+")";
+
+      var toUpdate =  obj.doneBy + " did: "+obj.event+" ("+obj.time+")";
       currentChange = obj.doneBy;
+      updateLog(toUpdate);
 }
 
     xhr.onloadend = function () {
       checkForError(xhr);
       }
     xhr.send();
-
 }
 
 document.getElementById("submit").addEventListener('click', function () {
@@ -146,4 +163,6 @@ document.getElementById("submit").addEventListener('click', function () {
     document.getElementById("input_ytid").value = yt_id;
     player.loadVideoById(yt_id);
 });
+
+
 

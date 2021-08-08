@@ -26,34 +26,38 @@
           <span>X</span>
         </div>
     </div>
-  
-    <div class="row">
-        <div class="col-3">
-          YT ID:
-          <input id="input_ytid" value="{{ ytid }}" disabled>
+
+  <div class="yt-container">
+      <div class="col-3">
+        <div class="row">
+            YT ID:
+            <input id="input_ytid" value="{{ ytid }}" disabled>
         </div>
-        <div class="col-3">
-          Room ID:
-          <input id="input_roomid" value="{{ roomId }}" disabled>
+        <div class="row">
+            Room ID:
+            <input id="input_roomid" value="{{ roomId }}" disabled>
         </div>
-        <div class="col-3">
-          User:
-        <input id="input_user" value="{{ user }}" disabled>
+        <div class="row">
+            User:
+            <input id="input_user" value="{{ user }}" disabled>
         </div>
-        <div class="col-3">
-          Change made by:
-          <input id="change" disabled>
+        <div class="row last-row">
+            Change made by:
+            <input id="change" disabled>
         </div>
-    </div>
+      </div>
+
+      <div class="col-6">
+        <div id="player"></div>
+      </div>
+
+      <div class="col-3">
+        <textarea id="event-log" disabled>
+        </textarea>
+      </div>
+  </div>
 
 
-    
-
-    <div class="row">
-      <div id="player" class="ytplayer"></div>
-    </div>
-    <br>
-    <br>
     <div class="row">
       <div class="col-9">
         <input type="text" id="ytid" placeholder="YouTube ID">

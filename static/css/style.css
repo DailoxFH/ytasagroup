@@ -1,9 +1,14 @@
 * {
     box-sizing: border-box;
     margin: 0 auto;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Roboto', sans-serif
 }
-.row::after {
+
+html {
+    height: 950px;
+}
+
+.row::after{
     content: "";
     clear: both;
     display: table;
@@ -12,6 +17,14 @@
 [class*="col-"] {
     float: left;
     padding: 15px;
+    width: 100%;
+}
+
+.center {
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
     width: 100%;
 }
 
@@ -29,6 +42,57 @@
     box-shadow: 0px 15px 20px rgba(38, 72, 226, 0.4);
     color: #fff;
 }
+
+
+
+.yt-container{
+    height: 650px;
+}
+
+.yt-container textarea {
+    resize: none;
+    width: 100%;
+    height: 100%;
+
+    border: 2px solid #990000;
+}
+
+.yt-container textarea:hover {
+    border: 2px solid rgba(38, 72, 226, 0.4);
+
+    cursor:pointer;
+}
+.yt-container .col-6, .yt-container .col-3 {
+    height: 100%;
+}
+
+.yt-container #player {
+    width: 100%;
+    height: 100%;
+}
+
+input {
+    width: 100%;
+    padding:25px;
+    display: block;
+    border: none;
+    border-radius: 0.4rem;
+}
+
+input:focus {
+    outline: none;
+    border: 2px solid #990000;
+}
+
+h3 {
+    font-weight: normal;
+    text-align: center;
+}
+
+.logo {
+    text-align: center;
+}
+
 
 /*https://codepen.io/seme332/pen/reJOwo*/
 .button {
@@ -57,45 +121,8 @@
 }
 /**/
 
-input {
-    width: 100%;
-    padding:25px;
-}
-.center {
-    position: absolute;
-    top: 50%;
-    -ms-transform: translateY(-50%);
-    transform: translateY(-50%);
-    width: 100%;
-}
-
-.ytplayer {
-    width: 100%;
-    height: 750px;
-}
-
 .submit-button {
     background-color: grey;
-}
-
-input {
-    display: block;
-    border: none;
-    border-radius: 0.4rem;
-}
-
-input:focus {
-    outline: none;
-    border: 2px solid #990000;
-}
-
-h3 {
-    font-weight: normal;
-    text-align: center;
-}
-
-.logo {
-    text-align: center;
 }
 
 
@@ -106,9 +133,17 @@ h3 {
 }
 @media only screen and (min-width: 768px) {
     .col-1 {width: 8.33%;}
+    .col-2 {width: 16.66%;}
     .col-3 {width: 25%;}
+    .col-4 {width: 33.33%;}
+    .col-5 {width: 41.66%;}
+    .col-6 {width: 50%;}
+    .col-7 {width: 58.33%;}
+    .col-8 {width: 66.66%;}
     .col-9 {width: 75%;}
-    .col-12 {width:100%;}
+    .col-10 {width: 83.33%;}
+    .col-11 {width: 91.66%;}
+    .col-12 {width: 100%;}
     .header .col-1{
         float: right;
         text-align: right;
@@ -117,5 +152,13 @@ h3 {
     .logo {
         float: left; 
         text-align:left; 
+    }
+
+    .yt-container .row::after{
+        margin-top: 92px;
+    }
+
+    .yt-container .last-row::after {
+        margin-top: 0px;
     }
 }
