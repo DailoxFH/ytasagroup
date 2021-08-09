@@ -139,11 +139,13 @@ function checkChanged() {
 
       } 
       if (obj.joined != undefined && !obj.seenNotification && obj.seenNotification != undefined) {
-          submit(2);
-          var toUpdate = '"'+obj.joined+'"';
-          document.getElementById("username_to_show").innerHTML = toUpdate;
-          showAlert();
-          updateLog(toUpdate+" joined!");
+          if(document.getElementById("input_user").value != obj.joined) {
+            submit(2);
+              var toUpdate = '"'+obj.joined+'"';
+              document.getElementById("username_to_show").innerHTML = toUpdate;
+              showAlert();
+              updateLog(toUpdate+" joined!");
+          }
       }
 
       var toUpdate =  obj.doneBy + " did: "+obj.event+" ("+obj.time+")";
