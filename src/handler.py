@@ -22,18 +22,24 @@ def update_rooms(room_id, user_to_add=None, video_to_add=None, delete=""):
         base_video = generator.update_dict(base_video, video_to_add)
     if not delete and user_to_add is not None:
         base_user = generator.update_dict(base_user, user_to_add)
-    else:
+    elif delete:
         if video_to_add is not None:
             del base_video[delete]
         if user_to_add is not None:
             del base_user[delete]
+    else:
+        del rooms[room_id]
+        return
 
     full_update = {room_id: {"video": base_video, "user": base_user}}
     rooms.update(full_update)
 
 
 def check_user(room_id):
-    where = cookies.check_cookie(rooms, request.cookies, room_id)
+    all_hashed_values = []
+    for k, v in request.cookies.items():
+        all_hashed_values.append(cookies.hashlib.sha512(request.cookies[k].encode()).hexdigest())
+    where = cookies.check_cookie(rooms, request.cookies, room_id, all_hashed_values)
     hashed_value = cookies.hashlib.sha512(request.cookies[where].encode())
     password = rooms[room_id]["user"][where]["password"]
     if password == hashed_value.hexdigest():
@@ -57,7 +63,6 @@ def create_cookie(room_id, username):
     for k, v in rooms[room_id]["user"].items():
         update_rooms(room_id,
                      user_to_add={k: {"password": rooms[room_id]["user"][k]["password"], "seenNotification": False}})
-
     return resp
 
 
@@ -87,7 +92,6 @@ def watch_yt():
         else:
             raise KeyError
     except (KeyError, IndexError):
-
         try:
             username = request.form["username"]
         except KeyError:
@@ -203,7 +207,6 @@ def changed():
                     "seenNotification": rooms[room_id]["user"][check_user_ret["where"]]["seenNotification"]}
         else:
             return error.username_not_found()
-
     except (KeyError, IndexError, TypeError):
         return error.username_not_found()
 
@@ -219,7 +222,10 @@ def disconnect():
 
     check_user_ret = check_user(room_id)
     if check_user_ret["status"]:
-        update_rooms(room_id, user_to_add={}, delete=check_user_ret["where"])
+        if len(rooms[room_id]["user"].keys()) <= 1:
+            update_rooms(room_id)
+        else:
+            update_rooms(room_id, user_to_add={}, delete=check_user_ret["where"])
         return "Success"
     else:
         return error.username_not_found()

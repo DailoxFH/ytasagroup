@@ -12,10 +12,12 @@ def create_cookie(room_id, username):
     return [resp, username, h.hexdigest()]
 
 
-def check_cookie(rooms, cookies, room_id):
+def check_cookie(rooms, cookies, room_id, all_hashed_values):
     where = ""
     for i in range(0, len(cookies)):
         for k, v in cookies.items():
             if k in rooms[room_id]["user"].keys():
-                where = k
+                if rooms[room_id]["user"][k]["password"] in all_hashed_values:
+                    where = k
     return where
+
