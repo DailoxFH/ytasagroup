@@ -104,7 +104,6 @@ function checkChanged() {
     xhr.open("GET", window.location.origin + "/changed?roomid=" + room_id + "&event=" + player.getPlayerState() + "&ytid=" + yt_id + "&time=" + time, true);
     xhr.onload = function () {
         let obj = JSON.parse(xhr.responseText);
-        let timeChecked = false;
         if (obj.status !== "OK") {
             if (obj.video !== yt_id) {
                 yt_id = obj.video;
@@ -112,7 +111,6 @@ function checkChanged() {
                 document.getElementById("input_ytid").value = yt_id;
             }
             if (obj.time - player.getCurrentTime() > 3.0 || obj.time - player.getCurrentTime() < -3.0) {
-                timeChecked = true;
                 player.seekTo(obj.time);
             }
 
@@ -134,8 +132,9 @@ function checkChanged() {
 
         }
         if (obj.joined !== undefined && !obj.seenNotification && obj.seenNotification !== undefined) {
-            if (document.getElementById("input_user").value !== obj.joined) {
+            if (activeUser !== obj.joined) {
                 if (obj.event === "PLAYING") {
+                    player.pauseVideo();
                     submit(2);
                 }
                 let toUpdateNotification = '"' + obj.joined + '"';
