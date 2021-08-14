@@ -1,8 +1,10 @@
+import shared_memory_dict.hooks
 from flask import Flask, render_template, request, send_from_directory
 from src import error
 from src import cookies
 from src import generator
 from shared_memory_dict import SharedMemoryDict
+import atexit
 
 rooms = SharedMemoryDict(name='rooms', size=1049000)
 
@@ -163,11 +165,14 @@ def submit_text():
 
             if rooms[room_id]["video"]["event"] == event_to_update and rooms[room_id]["video"]["ytid"] == yt_id:
                 stay_done_by = rooms[room_id]["video"]["doneBy"]
+                time = rooms[room_id]["video"]["time"]
 
             username = generator.remove_risky(check_user_ret["where"])
             yt_id = generator.remove_risky(yt_id)
             stay_done_by = generator.remove_risky(stay_done_by)
-            update_rooms(room_id, user_to_add={username:{"password": check_user_ret["password"], "seenNotification": True}}, video_to_add={"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": stay_done_by})
+            update_rooms(room_id,
+                         user_to_add={username: {"password": check_user_ret["password"], "seenNotification": True}},
+                         video_to_add={"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": stay_done_by})
             return {"status": "OK", "ytid": yt_id}
         else:
             return error.username_not_found()
@@ -243,3 +248,11 @@ def send_css(path):
 
 def get_app():
     return app
+
+
+def cleanup():
+    rooms.cleanup()
+    shared_memory_dict.hooks.free_shared_memory("rooms")
+
+
+atexit.register(cleanup)
