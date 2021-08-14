@@ -1,4 +1,4 @@
-from flask import Response
+from flask import Response, render_template
 
 
 def room_not_found():
@@ -13,8 +13,8 @@ def invalid_request():
     return Response("Invalid request", status=400)
 
 
-def username_already_taken():
-    return Response("Username already taken", status=401)
+def username_already_taken(room_id):
+    return render_template("username.html", room_id=room_id, already_taken=True)
 
 
 def username_too_long():

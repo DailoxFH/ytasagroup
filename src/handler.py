@@ -97,7 +97,7 @@ def watch_yt():
         try:
             username = request.form["username"]
         except KeyError:
-            return render_template("username.html", room_id=room_id, already_taken="")
+            return render_template("username.html", room_id=room_id, already_taken=False)
 
         if not username or username.isspace():
             return error.invalid_request()
@@ -105,7 +105,7 @@ def watch_yt():
         try:
             # noinspection PyStatementEffect
             rooms[room_id]["user"][username]
-            return error.username_already_taken()
+            return error.username_already_taken(room_id)
         except KeyError:
             return create_cookie(room_id, username)
 
