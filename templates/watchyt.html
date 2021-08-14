@@ -1,34 +1,33 @@
 <!DOCTYPE html>
-  <html lang="en">
-  <head>
+<html lang="en">
+<head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="static/css/style.css">
     <link rel="stylesheet" href="static/css/alert.css">
     <title>YouTube Watch</title>
-  </head>
-    <body>
+</head>
+<body>
 
-      <div class="header">
-        <div class="row">
-          <div class="col-3 logo">
+<div class="header">
+    <div class="row">
+        <div class="col-4 logo">
             <a href="/" class="button">YouTube as a group</a>
-          </div>
-          <div class="col-1">
-            <a href="https://github.com/DailoxFH/ytasagroup" target="_blank" class="button">Github</a>
-          </div>
         </div>
-      </div>
-    
-    <div class="alert hide">
-        <span id="username_to_show" class="msg"></span>
-        <span class="msg">joined the room!</span>
-        <div class="close-btn">
-          <span>X</span>
+        <div class="col-3">
+            <a href="https://github.com/DailoxFH/ytasagroup" target="_blank" class="button">Github</a>
         </div>
     </div>
+</div>
+<div class="alert hide">
+    <span id="username_to_show" class="msg"></span>
+    <span class="msg">joined the room!</span>
+    <div class="close-btn">
+        <span>X</span>
+    </div>
+</div>
 
-  <div class="yt-container">
-      <div class="col-3">
+<div class="yt-container">
+    <div class="col-3">
         <div class="row">
             YT ID:
             <input id="input_ytid" value="{{ ytid }}" disabled>
@@ -45,29 +44,29 @@
             Change made by:
             <input id="change" disabled>
         </div>
-      </div>
-
-      <div class="col-6">
-        <div id="player"></div>
-      </div>
-
-      <div class="col-3">
-        <textarea id="event-log" disabled>
-        </textarea>
-      </div>
-  </div>
-
-
-    <div class="row">
-      <div class="col-9">
-        <input type="text" id="ytid" placeholder="YouTube ID">
-      </div>
-      <div class="col-3">
-        <button id="submit" class="button">Submit</button>
-      </div>
     </div>
 
-    <script src="/static/js/youtube_player.js"></script>
-    <script src="/static/js/alert.js"></script>
-    </body>
-  </html>
+    <div class="col-6">
+        <div id="player"></div>
+    </div>
+
+    <div class="col-3">
+        <textarea id="event-log" disabled>
+        </textarea>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-9">
+        <input type="text" id="ytid" placeholder="YouTube ID">
+    </div>
+    <div class="col-3">
+        <button id="submit" class="button">Submit</button>
+    </div>
+</div>
+
+<script src="/static/js/youtube_player.js"></script>
+<script src="/static/js/alert.js"></script>
+</body>
+</html>
