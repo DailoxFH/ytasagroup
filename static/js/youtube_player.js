@@ -1,8 +1,7 @@
-let yt_id = document.getElementById("input_ytid").value;
-let room_id = document.getElementById("input_roomid").value;
-let activeUser = document.getElementById("input_user").value;
+let yt_id = document.getElementById("input_ytid").innerHTML;
+let room_id = document.getElementById("input_roomid").innerHTML;
+let activeUser = document.getElementById("username").value;
 let lastLog = "";
-
 window.addEventListener("beforeunload", function () {
     let xhr = new XMLHttpRequest();
     xhr.open("GET", window.location.origin + "/disconnect?roomid=" + room_id)
@@ -52,8 +51,8 @@ function updateLog(toUpdate) {
         let finalToUpdate = "\n(" + currentDate.getHours() + ":" + currentDate.getMinutes() + ":" + currentDate.getSeconds() + ")" + " " + toUpdate;
         let eventLog = document.getElementById("event-log");
         let changeInput = document.getElementById("change");
-        changeInput.value = toUpdate;
-        eventLog.value += finalToUpdate;
+        changeInput.innerHTML = toUpdate;
+        eventLog.innerHTML += finalToUpdate;
         eventLog.scrollTop = eventLog.scrollHeight;
         lastLog = toUpdate;
     }
@@ -108,7 +107,7 @@ function checkChanged() {
             if (obj.video !== yt_id) {
                 yt_id = obj.video;
                 player.loadVideoById(yt_id, obj.time);
-                document.getElementById("input_ytid").value = yt_id;
+                document.getElementById("input_ytid").innerHTML = yt_id;
             }
             if (obj.time - player.getCurrentTime() > 3.0 || obj.time - player.getCurrentTime() < -3.0) {
                 player.seekTo(obj.time);
@@ -143,7 +142,7 @@ function checkChanged() {
                 updateLog(toUpdateNotification + " joined!");
             }
         }
-        let toUpdate = obj.doneBy + " did: " + obj.event + " (" + obj.time + ")";
+        let toUpdate = obj.doneBy + " did: " + obj.event + " (" + Number((obj.time).toFixed(3)) + ")";
         updateLog(toUpdate);
 
     }
@@ -157,7 +156,7 @@ function checkChanged() {
 document.getElementById("submit").addEventListener('click', function () {
     yt_id = document.getElementById("ytid").value;
     submit(2, false);
-    document.getElementById("input_ytid").value = yt_id;
+    document.getElementById("input_ytid").innerHTML = yt_id;
     player.loadVideoById(yt_id);
 });
 

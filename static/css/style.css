@@ -92,6 +92,13 @@ h3 {
     text-align: center;
 }
 
+.informative {
+    width: 100%;
+    height: 25%;
+    padding: 24px;
+    background-color: lightgrey;
+}
+
 
 /*https://codepen.io/seme332/pen/reJOwo*/
 .button {
@@ -125,13 +132,12 @@ h3 {
     background-color: grey;
 }
 
-@media only screen and (min-width: 600px) {
-    input {
-        display: flex;
-    }
+input {
+    display: flex;
 }
 
-@media only screen and (min-width: 768px) {
+
+@media only screen and (min-width: 1281px) {
     .col-1 {
         width: 8.33%;
     }

@@ -42,7 +42,7 @@ def check_user(room_id):
     for k, v in request.cookies.items():
         all_hashed_values.append(cookies.hashlib.sha512(request.cookies[k].encode()).hexdigest())
     where = cookies.check_cookie(rooms, request.cookies, room_id, all_hashed_values)
-    hashed_value = cookies.hashlib.sha512(request.cookies[where].encode())
+    hashed_value = cookies.hashlib.sha512(generator.unquote_cookies(request.cookies)[where].encode())
     password = rooms[room_id]["user"][where]["password"]
     if password == hashed_value.hexdigest():
         return {"status": True, "where": where, "password": password}
@@ -56,7 +56,7 @@ def create_cookie(room_id, username):
     removed_username = cookie_ret[1]
     if not removed_username or removed_username.isspace():
         return error.invalid_username()
-    if len(removed_username) >= 21:
+    if removed_username is None:
         return error.username_too_long()
     val = cookie_ret[2]
 
@@ -65,6 +65,7 @@ def create_cookie(room_id, username):
     for k, v in rooms[room_id]["user"].items():
         update_rooms(room_id,
                      user_to_add={k: {"password": rooms[room_id]["user"][k]["password"], "seenNotification": False}})
+
     return resp
 
 
@@ -90,12 +91,12 @@ def watch_yt():
         if check_user_ret["status"]:
             where = check_user_ret["where"]
             # noinspection PyStatementEffect
-            rooms[room_id]["user"][where] != request.cookies[where]
+            rooms[room_id]["user"][where] != generator.unquote_cookies(request.cookies)[where]
         else:
             raise KeyError
     except (KeyError, IndexError):
         try:
-            username = request.form["username"]
+            username = cookies.escape(request.form["username"])
         except KeyError:
             return render_template("username.html", room_id=room_id, already_taken=False)
 
@@ -132,7 +133,7 @@ def generate_room():
     if not yt_id:
         return error.invalid_request()
     else:
-        yt_id = generator.remove_risky(yt_id)
+        yt_id = cookies.escape(yt_id)
     full_update = {room_id: {"video": {"ytid": yt_id, "event": "NOTHING", "time": 0.0, "doneBy": "NONE"}, "user": {}}}
     rooms.update(full_update)
     return create_cookie(room_id, username)
@@ -160,16 +161,15 @@ def submit_text():
     try:
         check_user_ret = check_user(room_id)
         if check_user_ret["status"]:
-            event_to_update = generator.remove_risky(generator.convert(event))
+            event_to_update = generator.convert(event)
             stay_done_by = check_user_ret["where"]
 
             if rooms[room_id]["video"]["event"] == event_to_update and rooms[room_id]["video"]["ytid"] == yt_id:
                 stay_done_by = rooms[room_id]["video"]["doneBy"]
                 time = rooms[room_id]["video"]["time"]
 
-            username = generator.remove_risky(check_user_ret["where"])
-            yt_id = generator.remove_risky(yt_id)
-            stay_done_by = generator.remove_risky(stay_done_by)
+            username = check_user_ret["where"]
+            yt_id = cookies.escape(yt_id)
             update_rooms(room_id,
                          user_to_add={username: {"password": check_user_ret["password"], "seenNotification": True}},
                          video_to_add={"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": stay_done_by})

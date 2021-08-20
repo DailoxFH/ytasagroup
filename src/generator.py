@@ -1,10 +1,12 @@
 import string
 import random
+from urllib.parse import unquote
 
 
 def generate_random(iterations, lower=False):
     if lower:
-        return ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(iterations))
+        return ''.join(
+            random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(iterations))
     else:
         return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(iterations))
 
@@ -47,17 +49,6 @@ def check_if_room_exists(rooms, roomid):
         return False
 
 
-def remove_risky(s):
-    s = s.replace("&", "")
-    s = s.replace(">", "")
-    s = s.replace("<", "")
-    s = s.replace("'", "")
-    s = s.replace('"', "")
-
-    s = s.replace(" ", "_")
-    return s
-
-
 def update_dict(base_dict, to_add):
     try:
         for k, v in to_add.items():
@@ -65,3 +56,11 @@ def update_dict(base_dict, to_add):
     except AttributeError:
         return base_dict
     return base_dict
+
+
+def unquote_cookies(cookie_dict):
+    new_cookies = {}
+    for k, v in cookie_dict.items():
+        new_cookies[unquote(k)] = v
+
+    return new_cookies

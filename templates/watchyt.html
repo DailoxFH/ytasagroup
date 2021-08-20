@@ -7,7 +7,6 @@
     <title>YouTube Watch</title>
 </head>
 <body>
-
 <div class="header">
     <div class="row">
         <div class="col-4 logo">
@@ -25,38 +24,36 @@
         <span>X</span>
     </div>
 </div>
-
+<input id="username" value="{{ user }}" type="hidden">
 <div class="yt-container">
     <div class="col-3">
         <div class="row">
-            YT ID:
-            <input id="input_ytid" value="{{ ytid }}" disabled>
+            YTID:
+            <div id="input_ytid" class="informative">{{ ytid }}</div>
         </div>
         <div class="row">
             Room ID:
-            <input id="input_roomid" value="{{ roomId }}" disabled>
+            <div id="input_roomid" class="informative">{{ roomId }}</div>
         </div>
         <div class="row">
             User:
-            <input id="input_user" value="{{ user }}" disabled>
+            <div id="input_user" class="informative">{{ user | safe}}</div>
         </div>
         <div class="row">
             Change made by:
-            <input id="change" disabled>
+            <div id="change" class="informative"></div>
         </div>
     </div>
-
     <div class="col-6">
         <div id="player"></div>
     </div>
-
     <div class="col-3">
         <textarea id="event-log" disabled>
         </textarea>
     </div>
 </div>
 
-
+<br>
 <div class="row">
     <div class="col-9">
         <input type="text" id="ytid" placeholder="YouTube ID">
