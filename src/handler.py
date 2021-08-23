@@ -72,7 +72,7 @@ def create_cookie(room_id, username):
 @app.route("/watch_yt", methods=["GET", "POST"])
 def watch_yt():
     try:
-        room_id = request.args.get("roomid")
+        room_id = cookies.escape(request.args.get("roomid"))
         if not generator.check_if_room_exists(rooms, room_id):
             return error.room_not_found()
     except KeyError:
@@ -117,9 +117,9 @@ def watch_yt():
 def generate_room():
     global rooms
     try:
-        yt_id = request.form["ytid"]
-        username = request.form["username"]
-        if username == "":
+        yt_id = cookies.escape(request.form["ytid"])
+        username = cookies.escape(request.form["username"])
+        if not username:
             raise KeyError
     except KeyError:
         return error.room_not_found()
@@ -132,8 +132,7 @@ def generate_room():
     yt_id = generator.get_id_from_link(yt_id)
     if not yt_id:
         return error.invalid_request()
-    else:
-        yt_id = cookies.escape(yt_id)
+
     full_update = {room_id: {"video": {"ytid": yt_id, "event": "NOTHING", "time": 0.0, "doneBy": "NONE"}, "user": {}}}
     rooms.update(full_update)
     return create_cookie(room_id, username)
@@ -145,7 +144,7 @@ def submit_text():
         yt_id = generator.get_id_from_link(request.args.get("ytid"))
         if not yt_id:
             return error.invalid_request()
-        room_id = request.args.get("roomid")
+        room_id = cookies.escape(request.args.get("roomid"))
         if not generator.check_if_room_exists(rooms, room_id):
             return error.room_not_found()
         event = request.args.get("event")
@@ -183,7 +182,7 @@ def submit_text():
 @app.route("/changed", methods=["GET"])
 def changed():
     try:
-        room_id = request.args.get("roomid")
+        room_id = cookies.escape(request.args.get("roomid"))
         if not generator.check_if_room_exists(rooms, room_id):
             return error.room_not_found()
         event = request.args.get("event")
@@ -219,7 +218,7 @@ def changed():
 @app.route("/disconnect", methods=["GET"])
 def disconnect():
     try:
-        room_id = request.args.get("roomid")
+        room_id = cookies.escape(request.args.get("roomid"))
         if not generator.check_if_room_exists(rooms, room_id):
             return error.room_not_found()
     except KeyError:

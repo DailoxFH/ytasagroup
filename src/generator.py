@@ -1,7 +1,7 @@
 import string
 import random
 from urllib.parse import unquote
-
+from src.cookies import escape
 
 def generate_random(iterations, lower=False):
     if lower:
@@ -12,6 +12,7 @@ def generate_random(iterations, lower=False):
 
 
 def get_id_from_link(link):
+    link = escape(link)
     to_check = ["/watch?v=", "/embed/", "/v/", "youtu.be"]
     if any(substring in link for substring in to_check):
         splitted_url = link.split('/')
@@ -43,7 +44,7 @@ def convert(event):
 def check_if_room_exists(rooms, roomid):
     try:
         # noinspection PyStatementEffect
-        rooms[roomid]
+        rooms[escape(roomid)]
         return True
     except KeyError:
         return False

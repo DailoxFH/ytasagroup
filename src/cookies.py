@@ -1,3 +1,4 @@
+import markupsafe
 from flask import make_response, redirect, url_for, escape
 import hashlib
 from src.generator import generate_random
@@ -7,7 +8,12 @@ from urllib.parse import quote, unquote
 def create_cookie(room_id, username):
     resp = make_response(redirect(url_for("watch_yt", roomid=room_id), code=307))
     id = generate_random(24, True)
-    removed_username = escape(username)
+
+    if not isinstance(username, markupsafe.Markup):
+        removed_username = escape(username)
+    else:
+        removed_username = username
+
     encoded_username = quote(removed_username)
     resp.set_cookie(encoded_username, id, samesite="strict", secure=True)
     h = hashlib.sha512(id.encode())
