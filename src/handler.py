@@ -54,10 +54,10 @@ def create_cookie(room_id, username):
     cookie_ret = cookies.create_cookie(room_id, username)
     resp = cookie_ret[0]
     removed_username = cookie_ret[1]
-    if not removed_username or removed_username.isspace():
-        return error.invalid_username()
     if removed_username is None:
         return error.username_too_long()
+    if not removed_username or removed_username.isspace():
+        return error.invalid_username()
     val = cookie_ret[2]
 
     update_rooms(room_id, user_to_add={removed_username: {"password": val}}, video_to_add={"joined": removed_username})
