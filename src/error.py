@@ -1,25 +1,29 @@
-from flask import Response, render_template
+from flask import render_template
 
 
 def room_not_found():
-    return Response("Room not found OR could not be created", status=404)
+    return render_template("error.html", msg="Room not found OR could not be created"), 404
 
 
 def username_not_found():
-    return Response("Username not found", status=401)
+    return render_template("error.html", msg="Username not found"), 401
 
 
-def invalid_request():
-    return Response("Invalid request", status=400)
+def invalid_request(template):
+    return render_template(template, msg="Invalid Request. Please try again!"), 400
+
+
+def username_errors(room_id, message):
+    return render_template("username.html", room_id=room_id, msg=message), 400
 
 
 def username_already_taken(room_id):
-    return render_template("username.html", room_id=room_id, already_taken=True)
+    return username_errors(room_id, "This username is already taken")
 
 
-def username_too_long():
-    return Response("Username is too long. Please choose a shorter one", status=400)
+def username_too_long(room_id):
+    return username_errors(room_id, "Username is too long. Please choose a shorter one")
 
 
-def invalid_username():
-    return Response("Invalid username. Please choose a different one", status=400)
+def invalid_username(room_id):
+    return username_errors(room_id, "Invalid username. Please choose a different one")

@@ -1,6 +1,6 @@
 let yt_id = document.getElementById("input_ytid").innerHTML;
 let room_id = document.getElementById("input_roomid").innerHTML;
-let activeUser = document.getElementById("username").value;
+let activeUser = username;
 let lastLog = "";
 window.addEventListener("beforeunload", function () {
     let xhr = new XMLHttpRequest();
@@ -134,8 +134,8 @@ function checkChanged() {
             if (activeUser !== obj.joined) {
                 if (obj.event === "PLAYING") {
                     player.pauseVideo();
-                    submit(2);
                 }
+                submit(2);
                 let toUpdateNotification = '"' + obj.joined + '"';
                 document.getElementById("username_to_show").innerHTML = toUpdateNotification;
                 showAlert();

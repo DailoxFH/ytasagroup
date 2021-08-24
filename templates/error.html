@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="static/css/style.css">
-    <title>YouTube as a group</title>
+    <title>Error!</title>
 </head>
 <body>
 
@@ -18,19 +18,14 @@
     </div>
 </div>
 
+{% if msg %}
 <div class="center">
-    {% if msg %}
     <div class="row">
-        <div class="col-12">
-            <h3>{{ msg }}</h3>
+        <div class="col-12" style="text-align:center;">
+            <h2>{{ msg }}</h2>
         </div>
     </div>
-    {% endif %}
-    <form action="/generate_room" method="post">
-        <input type="text" class="form_input" placeholder="YouTube ID" name="ytid"/>
-        <input type="text" class="form_input" placeholder="Username" name="username"/>
-        <input type="submit" class="button submit-button"/>
-    </form>
 </div>
+{% endif %}
 </body>
-</html>
+

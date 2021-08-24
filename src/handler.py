@@ -55,9 +55,9 @@ def create_cookie(room_id, username):
     resp = cookie_ret[0]
     removed_username = cookie_ret[1]
     if removed_username is None:
-        return error.username_too_long()
+        return error.username_too_long(room_id)
     if not removed_username or removed_username.isspace():
-        return error.invalid_username()
+        return error.invalid_username(room_id)
     val = cookie_ret[2]
 
     update_rooms(room_id, user_to_add={removed_username: {"password": val}}, video_to_add={"joined": removed_username})
@@ -74,7 +74,7 @@ def watch_yt():
     try:
         room_id = cookies.escape(request.args.get("roomid"))
         if not generator.check_if_room_exists(rooms, room_id):
-            return error.room_not_found()
+            raise KeyError
     except KeyError:
         return error.room_not_found()
 
@@ -85,7 +85,7 @@ def watch_yt():
 
     yt_id = generator.get_id_from_link(yt_id)
     if not yt_id:
-        return error.invalid_request()
+        return error.invalid_request("username.html")
     try:
         check_user_ret = check_user(room_id)
         if check_user_ret["status"]:
@@ -101,7 +101,7 @@ def watch_yt():
             return render_template("username.html", room_id=room_id, already_taken=False)
 
         if not username or username.isspace():
-            return error.invalid_request()
+            return error.invalid_username(room_id)
 
         try:
             # noinspection PyStatementEffect
@@ -131,7 +131,7 @@ def generate_room():
 
     yt_id = generator.get_id_from_link(yt_id)
     if not yt_id:
-        return error.invalid_request()
+        return error.invalid_request("session.html")
 
     full_update = {room_id: {"video": {"ytid": yt_id, "event": "NOTHING", "time": 0.0, "doneBy": "NONE"}, "user": {}}}
     rooms.update(full_update)
@@ -143,7 +143,7 @@ def submit_text():
     try:
         yt_id = generator.get_id_from_link(request.args.get("ytid"))
         if not yt_id:
-            return error.invalid_request()
+            return error.invalid_request("error.html")
         room_id = cookies.escape(request.args.get("roomid"))
         if not generator.check_if_room_exists(rooms, room_id):
             return error.room_not_found()
@@ -151,11 +151,11 @@ def submit_text():
         try:
             time = float(request.args.get("time"))
         except ValueError:
-            return error.invalid_request()
+            return error.invalid_request("error.html")
         list(request.cookies.keys())
         list(request.cookies.values())
     except(KeyError, TypeError):
-        return error.invalid_request()
+        return error.invalid_request("error.html")
 
     try:
         check_user_ret = check_user(room_id)
@@ -172,6 +172,7 @@ def submit_text():
             update_rooms(room_id,
                          user_to_add={username: {"password": check_user_ret["password"], "seenNotification": True}},
                          video_to_add={"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": stay_done_by})
+
             return {"status": "OK", "ytid": yt_id}
         else:
             return error.username_not_found()
@@ -188,9 +189,9 @@ def changed():
         event = request.args.get("event")
         yt_id = generator.get_id_from_link(request.args.get("ytid"))
         if not yt_id:
-            return error.invalid_request()
+            return error.invalid_request("error.html")
     except KeyError:
-        return error.invalid_request()
+        return error.invalid_request("error.html")
 
     try:
         check_user_ret = check_user(room_id)
@@ -222,7 +223,7 @@ def disconnect():
         if not generator.check_if_room_exists(rooms, room_id):
             return error.room_not_found()
     except KeyError:
-        return error.invalid_request()
+        return error.invalid_request("error.html")
 
     check_user_ret = check_user(room_id)
     if check_user_ret["status"]:

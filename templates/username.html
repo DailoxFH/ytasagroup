@@ -19,10 +19,10 @@
 </div>
 
 
-{% if already_taken %}
+{% if msg %}
 <div class="row">
     <div class="col-12">
-        <h3>This username is already taken!</h3>
+        <h3>{{ msg }}</h3>
     </div>
 </div>
 {% endif %}
