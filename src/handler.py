@@ -69,6 +69,15 @@ def create_cookie(room_id, username):
     return resp
 
 
+def get_all_users_in_room(room_id):
+    to_ret = []
+
+    for k, v in rooms[room_id]["user"].items():
+        to_ret.append(k)
+
+    return to_ret
+
+
 @app.route("/watch_yt", methods=["GET", "POST"])
 def watch_yt():
     try:
@@ -209,7 +218,8 @@ def changed():
 
             return {"status": status, "doneBy": current_done_by, "event": current_event, "time": current_time,
                     "video": current_yt_id, "joined": rooms[room_id]["video"]["joined"],
-                    "seenNotification": rooms[room_id]["user"][check_user_ret["where"]]["seenNotification"]}
+                    "seenNotification": rooms[room_id]["user"][check_user_ret["where"]]["seenNotification"],
+                    "allUsers": get_all_users_in_room(room_id)}
         else:
             return error.username_not_found()
     except (KeyError, IndexError, TypeError):

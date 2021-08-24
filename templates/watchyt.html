@@ -7,7 +7,9 @@
     <title>YouTube Watch</title>
 
     <script type="text/javascript">
-        let username = "{{ user }}"
+        let activeUser = "{{ user }}";
+        let yt_id = "{{ ytid }}";
+        let room_id = "{{ roomId }}";
     </script>
 </head>
 <body>
@@ -28,7 +30,6 @@
         <span>X</span>
     </div>
 </div>
-<input id="username" value="{{ user }}" type="hidden">
 <div class="yt-container">
     <div class="col-3">
         <div class="row">
@@ -52,8 +53,10 @@
         <div id="player"></div>
     </div>
     <div class="col-3">
-        <textarea id="event-log" disabled>
-        </textarea>
+        <label for="event-log">Events</label><textarea id="event-log" disabled>
+            </textarea>
+        <label for="user-list">Active Users</label><textarea id="user-list" disabled>
+            </textarea>
     </div>
 </div>
 

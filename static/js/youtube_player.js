@@ -1,7 +1,5 @@
-let yt_id = document.getElementById("input_ytid").innerHTML;
-let room_id = document.getElementById("input_roomid").innerHTML;
-let activeUser = username;
 let lastLog = "";
+let lastAllUsers = [];
 window.addEventListener("beforeunload", function () {
     let xhr = new XMLHttpRequest();
     xhr.open("GET", window.location.origin + "/disconnect?roomid=" + room_id)
@@ -144,6 +142,16 @@ function checkChanged() {
         }
         let toUpdate = obj.doneBy + " did: " + obj.event + " (" + Number((obj.time).toFixed(3)) + ")";
         updateLog(toUpdate);
+
+        if(obj.allUsers !== lastAllUsers) {
+            let userList = document.getElementById("user-list");
+            userList.innerHTML = "";
+            for (let i = 0; i < obj.allUsers.length; i++) {
+                userList.innerHTML += "\n - "+obj.allUsers[i];
+            }
+            userList.scrollTop = userList.scrollHeight;
+            lastAllUsers = obj.allUsers;
+        }
 
     }
 
