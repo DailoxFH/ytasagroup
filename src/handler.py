@@ -60,11 +60,14 @@ def create_cookie(room_id, username):
         return error.invalid_username(room_id)
     val = cookie_ret[2]
 
-    update_rooms(room_id, user_to_add={removed_username: {"password": val}}, video_to_add={"joined": removed_username})
+    try:
+        temp_joined = rooms[room_id]["video"]["joined"]
+    except KeyError:
+        temp_joined = []
 
-    for k, v in rooms[room_id]["user"].items():
-        update_rooms(room_id,
-                     user_to_add={k: {"password": rooms[room_id]["user"][k]["password"], "seenNotification": False}})
+    temp_joined.append(removed_username)
+
+    update_rooms(room_id, user_to_add={removed_username: {"password": val}}, video_to_add={"joined": temp_joined})
 
     return resp
 
@@ -178,14 +181,17 @@ def submit_text():
 
             username = check_user_ret["where"]
             yt_id = cookies.escape(yt_id)
+
             update_rooms(room_id,
-                         user_to_add={username: {"password": check_user_ret["password"], "seenNotification": True}},
+                         user_to_add={
+                             username: {"password": check_user_ret["password"]}},
                          video_to_add={"ytid": yt_id, "event": event_to_update, "time": time, "doneBy": stay_done_by})
 
             return {"status": "OK", "ytid": yt_id}
         else:
             return error.username_not_found()
-    except (KeyError, IndexError, TypeError):
+    except (KeyError, IndexError, TypeError) as e:
+        print(e)
         return error.username_not_found()
 
 
@@ -217,8 +223,7 @@ def changed():
                 status = "OUT"
 
             return {"status": status, "doneBy": current_done_by, "event": current_event, "time": current_time,
-                    "video": current_yt_id, "joined": rooms[room_id]["video"]["joined"],
-                    "seenNotification": rooms[room_id]["user"][check_user_ret["where"]]["seenNotification"],
+                    "video": current_yt_id,
                     "allUsers": get_all_users_in_room(room_id)}
         else:
             return error.username_not_found()

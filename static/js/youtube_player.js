@@ -128,26 +128,25 @@ function checkChanged() {
             yt_id = obj.video;
 
         }
-        if (obj.joined !== undefined && !obj.seenNotification && obj.seenNotification !== undefined) {
-            if (activeUser !== obj.joined) {
-                if (obj.event === "PLAYING") {
-                    player.pauseVideo();
-                }
-                submit(2);
-                let toUpdateNotification = '"' + obj.joined + '"';
-                document.getElementById("username_to_show").innerHTML = toUpdateNotification;
-                showAlert();
-                updateLog(toUpdateNotification + " joined!");
-            }
-        }
         let toUpdate = obj.doneBy + " did: " + obj.event + " (" + Number((obj.time).toFixed(3)) + ")";
         updateLog(toUpdate);
 
-        if(obj.allUsers !== lastAllUsers) {
+        if (obj.allUsers !== lastAllUsers) {
             let userList = document.getElementById("user-list");
             userList.innerHTML = "";
             for (let i = 0; i < obj.allUsers.length; i++) {
-                userList.innerHTML += "\n - "+obj.allUsers[i];
+                let currentUser = obj.allUsers[i];
+                if (!lastAllUsers.includes(currentUser)) {
+                    if (obj.event === "PLAYING") {
+                        player.pauseVideo();
+                    }
+                    submit(2, true);
+                    let toUpdateNotification = '"' + currentUser + '"';
+                    document.getElementById("username_to_show").innerHTML = toUpdateNotification;
+                    showAlert();
+                    updateLog(toUpdateNotification + " joined!");
+                }
+                userList.innerHTML += "\n - " + currentUser;
             }
             userList.scrollTop = userList.scrollHeight;
             lastAllUsers = obj.allUsers;
