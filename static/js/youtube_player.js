@@ -137,10 +137,9 @@ function checkChanged() {
             for (let i = 0; i < obj.allUsers.length; i++) {
                 let currentUser = obj.allUsers[i];
                 if (!lastAllUsers.includes(currentUser)) {
-                    if (obj.event === "PLAYING") {
+                    if (obj.event === "PLAYING" && currentUser !== activeUser) {
                         player.pauseVideo();
                     }
-                    submit(2, true);
                     let toUpdateNotification = '"' + currentUser + '"';
                     document.getElementById("username_to_show").innerHTML = toUpdateNotification;
                     showAlert();
