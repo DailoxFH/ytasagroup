@@ -37,12 +37,15 @@ def update_rooms(room_id, user_to_add=None, video_to_add=None, delete=""):
     rooms.update(full_update)
 
 
-def check_user(room_id):
+def check_user(room_id, request_cookies=None):
+    if request_cookies is None:
+        request_cookies = request.cookies
+        
     all_hashed_values = []
     for k, v in request.cookies.items():
-        all_hashed_values.append(cookies.hashlib.sha512(request.cookies[k].encode()).hexdigest())
-    where = cookies.check_cookie(rooms, request.cookies, room_id, all_hashed_values)
-    hashed_value = cookies.hashlib.sha512(generator.unquote_cookies(request.cookies)[where].encode())
+        all_hashed_values.append(cookies.hashlib.sha512(request_cookies[k].encode()).hexdigest())
+    where = cookies.check_cookie(rooms, request_cookies, room_id, all_hashed_values)
+    hashed_value = cookies.hashlib.sha512(generator.unquote_cookies(request_cookies)[where].encode())
     password = rooms[room_id]["user"][where]["password"]
     if password == hashed_value.hexdigest():
         return {"status": True, "where": where, "password": password}
@@ -240,7 +243,8 @@ def disconnect():
     except KeyError:
         return error.invalid_request("error.html")
 
-    check_user_ret = check_user(room_id)
+    request_cookies = request.cookies
+    check_user_ret = check_user(room_id, request_cookies)
     if check_user_ret["status"]:
         if len(rooms[room_id]["user"].keys()) <= 1:
             update_rooms(room_id)
