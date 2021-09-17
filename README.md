@@ -13,6 +13,7 @@ python3 -m venv ytasagroupenv
 source ytasagroupenv/bin/activate
 pip install wheel
 pip install -r requirements.txt
+deactivate
 ```
 
 To start the server:
