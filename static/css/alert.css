@@ -5,16 +5,16 @@ https://www.codingnepalweb.com/custom-warning-alert-notification/
 .alert {
   background:#990000;
   padding: 20px;
-  width: 100%;
+  width: 95%;
   position: absolute;
   right: 0;
   top: 10px;
   border-radius: 4px;
   border-left: 8px solid rgb(179, 3, 3);
-  overflow: hidden;
   opacity: 0;
+  overflow: hidden;
   pointer-events: none;
-
+  white-space: normal;
   text-align: left;
 }
 
@@ -59,31 +59,42 @@ https://www.codingnepalweb.com/custom-warning-alert-notification/
 .alert .msg{
   font-size: 18px;
   color: black;
+  word-wrap: break-word;
+  width: 80%;
+  text-align: left;
 }
-.alert .msg::after {
-  content: "\A";
-  white-space: pre;
-}
+
 .alert .close-btn{
   position: absolute;
-  right: 0px;
+  right: 0;
   top: 50%;
   transform: translateY(-50%);
   background: rgb(179, 3, 3);
-  padding: 30px 20px;
+  padding: 10px;
   cursor: pointer;
+  height: 100%;
 }
+
+
 .alert .close-btn:hover{
   background: rgb(231, 5, 5);
 }
 
+.alert .close-btn span{
+  color: black;
+  font-size: 2em;
+  font-weight: bold;
+  text-align: left;
+  border-radius: 5px;
+}
 
-@media only screen and (min-width: 768px) {
+
+@media only screen and (min-width: 1281px) {
   .alert{
-    min-width: 200px;
-    max-width: 338px;
+    min-width: 310px;
+    max-width: 390px;
   }
-  
+
 }
 
 /**/

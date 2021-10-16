@@ -40,7 +40,7 @@ def update_rooms(room_id, user_to_add=None, video_to_add=None, delete=""):
 def check_user(room_id, request_cookies=None):
     if request_cookies is None:
         request_cookies = request.cookies
-        
+
     all_hashed_values = []
     for k, v in request.cookies.items():
         all_hashed_values.append(cookies.hashlib.sha512(request_cookies[k].encode()).hexdigest())
@@ -156,12 +156,12 @@ def generate_room():
 @app.route("/submit_text", methods=["GET"])
 def submit_text():
     try:
-        yt_id = generator.get_id_from_link(request.args.get("ytid"))
-        if not yt_id:
-            return error.invalid_request("error.html")
         room_id = cookies.escape(request.args.get("roomid"))
         if not generator.check_if_room_exists(rooms, room_id):
             return error.room_not_found()
+        yt_id = generator.get_id_from_link(request.args.get("ytid"))
+        if not yt_id:
+            return error.invalid_request(message=rooms[room_id]["video"]["ytid"])
         event = request.args.get("event")
         try:
             time = float(request.args.get("time"))
@@ -184,7 +184,6 @@ def submit_text():
 
             username = check_user_ret["where"]
             yt_id = cookies.escape(yt_id)
-
             update_rooms(room_id,
                          user_to_add={
                              username: {"password": check_user_ret["password"]}},
@@ -194,7 +193,6 @@ def submit_text():
         else:
             return error.username_not_found()
     except (KeyError, IndexError, TypeError) as e:
-        print(e)
         return error.username_not_found()
 
 
@@ -207,7 +205,7 @@ def changed():
         event = request.args.get("event")
         yt_id = generator.get_id_from_link(request.args.get("ytid"))
         if not yt_id:
-            return error.invalid_request("error.html")
+            return error.invalid_request(message=rooms[room_id]["video"]["ytid"])
     except KeyError:
         return error.invalid_request("error.html")
 

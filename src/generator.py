@@ -3,6 +3,7 @@ import random
 from urllib.parse import unquote
 from src.cookies import escape
 
+
 def generate_random(iterations, lower=False):
     if lower:
         return ''.join(
@@ -16,7 +17,10 @@ def get_id_from_link(link):
     to_check = ["/watch?v=", "/embed/", "/v/", "youtu.be"]
     if any(substring in link for substring in to_check):
         splitted_url = link.split('/')
-        return splitted_url[-1].replace("watch?v=", "")
+        id = splitted_url[-1].replace("watch?v=", "")
+        if len(id) != 11:
+            return False
+        return id
     elif len(link) == 11 and '/' not in link:
         return link
     else:

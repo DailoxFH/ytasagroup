@@ -9,8 +9,11 @@ def username_not_found():
     return render_template("error.html", msg="Username not found"), 401
 
 
-def invalid_request(template):
-    return render_template(template, msg="Invalid Request. Please try again!"), 400
+def invalid_request(template=None, message=None):
+    if template is not None:
+        return render_template(template, msg="Invalid Request. Please try again!"), 400
+    elif message is not None:
+        return message, 400
 
 
 def username_errors(room_id, message):

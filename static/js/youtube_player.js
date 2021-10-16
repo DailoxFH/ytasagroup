@@ -29,11 +29,12 @@ function onYouTubeIframeAPIReady() {
     });
 }
 
+
 let t;
 
 function onPlayerReady(event) {
-    checkChanged();
     t = setInterval(checkChanged, 1000);
+    checkChanged(true);
 }
 
 function onPlayerStateChange(event) {
@@ -57,12 +58,13 @@ function updateLog(toUpdate) {
 }
 
 function checkForError(xhr) {
-    if (xhr.status === 401 || xhr.status === 400 || xhr.status === 404) {
-        document.body.innerHTML = xhr.responseText;
+    let error = false;
+    if (xhr.status === 401 || xhr.status === 404) {
         clearInterval(t);
-        return true;
+        document.body.innerHTML = xhr.responseText;
+        error = true;
     }
-    return false;
+    return error;
 }
 
 function submit(event, asynchronous = true) {
@@ -77,12 +79,15 @@ function submit(event, asynchronous = true) {
 
     submit_xhr.open("GET", requeststr, asynchronous);
 
-
+    let isOk = false;
     submit_xhr.onloadend = function () {
         let obj = JSON.parse(submit_xhr.responseText);
         checkForError(submit_xhr);
         if (obj.status === "OK" && obj.ytid !== undefined && obj.ytid !== yt_id) {
             tmpYtId = obj.ytid;
+        }
+        if(submit_xhr.status !== 400) {
+            isOk = true;
         }
     }
 
@@ -90,9 +95,16 @@ function submit(event, asynchronous = true) {
 
     yt_id = tmpYtId;
 
+    return isOk;
+
 }
 
-function checkChanged() {
+function showMessage(msg) {
+    document.getElementById("username_to_show").innerHTML = msg;
+    showAlert();
+}
+
+function checkChanged(firstRun=false) {
     let xhr = new XMLHttpRequest();
     let time = 0;
     if (player.getCurrentTime() !== undefined) {
@@ -104,7 +116,11 @@ function checkChanged() {
         if (obj.status !== "OK") {
             if (obj.video !== yt_id) {
                 yt_id = obj.video;
-                player.loadVideoById(yt_id, obj.time);
+                if(firstRun) {
+                    player.loadVideoById(yt_id, obj.time);
+                } else {
+                    player.loadVideoById(yt_id);
+                }
                 document.getElementById("input_ytid").innerHTML = yt_id;
             }
             if (obj.time - player.getCurrentTime() > 3.0 || obj.time - player.getCurrentTime() < -3.0) {
@@ -140,10 +156,9 @@ function checkChanged() {
                     if (obj.event === "PLAYING" && currentUser !== activeUser) {
                         player.pauseVideo();
                     }
-                    let toUpdateNotification = '"' + currentUser + '"';
-                    document.getElementById("username_to_show").innerHTML = toUpdateNotification;
-                    showAlert();
-                    updateLog(toUpdateNotification + " joined!");
+                    let toUpdateNotification = '"' + currentUser + '" joined the room!';
+                    showMessage(toUpdateNotification);
+                    updateLog(toUpdateNotification);
                 }
                 userList.innerHTML += "\n - " + currentUser;
             }
@@ -155,15 +170,20 @@ function checkChanged() {
 
     xhr.onloadend = function () {
         checkForError(xhr);
+        if (xhr.status === 400) {
+            yt_id = xhr.responseText;
+            showMessage("Invalid Request. Please try again!");
+            document.getElementById("ytid").value = "";
+        }
     }
     xhr.send();
 }
 
 document.getElementById("submit").addEventListener('click', function () {
     yt_id = document.getElementById("ytid").value;
-    submit(2, false);
-    document.getElementById("input_ytid").innerHTML = yt_id;
-    player.loadVideoById(yt_id);
+    if(submit(2, false)) {
+        player.loadVideoById(yt_id);
+    }
 });
 
 
